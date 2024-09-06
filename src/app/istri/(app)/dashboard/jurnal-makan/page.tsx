@@ -58,7 +58,7 @@ const mealCategories = {
   karbohidrat: [
     { src: "/images/nasi-1-piring.jpg", alt: "Nasi 1 Piring", title: "Nasi", description: "1 Piring Kecil" },
     { src: "/images/kentang-2-buah.jpg", alt: "Kentang 2 Buah", title: "Kentang", description: "2 Buah Ukuran Sedang" },
-    { src: "/images/Mie-2-buah.jpg", alt: "Mie 2 Buah", title: "Mie", description: "2 Buah Ukuran Sedang" },
+    { src: "/images/mie-2-buah.jpg", alt: "Mie 2 Buah", title: "Mie", description: "2 Buah Ukuran Sedang" },
     { src: "/images/ubi-1-biji-sedang.jpg", alt: "Ubi 1 Biji Sedang", title: "Ubi", description: "1 Biji Sedang" },
     { src: "/images/roti-3-lembar.jpg", alt: "Roti 3 Lembar", title: "Roti", description: "3 Lembar" },
     { src: "/images/singkong-1-setengah-buah.jpg", alt: "Singkong 1 Setengah Buah", title: "Singkong", description: "1.5 Buah" },
