@@ -1,49 +1,53 @@
-import getTokenFromApiServer from "@/libs/googleauth";
+// import getTokenFromApiServer from "@/libs/googleauth";
+import { authOptions } from "@/libs/auth";
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET!,
-  callbacks: {
-    async signIn({ account, user }) {
-      if (account?.provider === "google") {
-        const googleUser = {
-          email: user.email,
-          // name: user.name,
-        };
+// import GoogleProvider from "next-auth/providers/google";
 
-        account.access_token = await getTokenFromApiServer(
-          "google",
-          googleUser
-        );
+const handler = NextAuth(authOptions);
 
-        // console.log(account.access_token);
+// const handler = NextAuth({
+//   providers: [
+//     GoogleProvider({
+//       clientId: process.env.GOOGLE_CLIENT_ID!,
+//       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+//     }),
+//   ],
+//   secret: process.env.NEXTAUTH_SECRET!,
+//   callbacks: {
+//     async signIn({ account, user }) {
+//       if (account?.provider === "google") {
+//         const googleUser = {
+//           email: user.email,
+//           // name: user.name,
+//         };
 
-        return true;
-      }
-      return true;
-    },
-    jwt({ token, user, account }) {
-      // if (user) {
-      //   token = { ...token, accessToken: account?.accessToken };
-      //   return { ...token, accessToken: account?.access_token };
-      // }
-      // return token;
-      if (account?.provider === "google") {
-        return { ...token, accessToken: account.access_token };
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.accessToken = token.accessToken;
-      return session;
-    },
-  },
-});
+//         account.access_token = await getTokenFromApiServer(
+//           "google",
+//           googleUser
+//         );
 
-export { handler as GET, handler as POST, handler };
+//         // console.log(account.access_token);
+
+//         return true;
+//       }
+//       return true;
+//     },
+//     jwt({ token, user, account }) {
+//       // if (user) {
+//       //   token = { ...token, accessToken: account?.accessToken };
+//       //   return { ...token, accessToken: account?.access_token };
+//       // }
+//       // return token;
+//       if (account?.provider === "google") {
+//         return { ...token, accessToken: account.access_token };
+//       }
+//       return token;
+//     },
+//     async session({ session, token }) {
+//       session.accessToken = token.accessToken;
+//       return session;
+//     },
+//   },
+// });
+
+export { handler as GET, handler as POST };

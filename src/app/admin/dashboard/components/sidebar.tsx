@@ -52,6 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, activeMenu }) => {
 
   const handleMenuClick = (menu: string) => {
     setActiveMenu(menu);
+    localStorage.setItem('activeMenu', menu); // Simpan activeMenu ke localStorage
   };
 
   return (

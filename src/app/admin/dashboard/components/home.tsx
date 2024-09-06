@@ -29,7 +29,7 @@ interface DataItem {
   resiko_anemia: ResikoAnemia[];
 }
 
-const Dashboard = () => {
+const HomePage = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     ibu_hamil: 0,
     ibu_hamil_anemia_rendah: 0,
@@ -176,4 +176,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default HomePage;

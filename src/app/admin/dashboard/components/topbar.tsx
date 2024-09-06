@@ -40,15 +40,14 @@ const TopBar: React.FC<TopBarProps> = ({ title, userName, userImage }) => {
           onClick={toggleDropdown}
           className="flex items-center space-x-2 p-1 rounded-lg"
         >
-          {userImage && (
-            <Image
-              src={userImage}
-              alt={userName || "User Image"}
-              width={40} 
-              height={40} 
-              className="rounded-lg border border-gray-300"
-            />
-          )}
+          <Image
+            src={userImage || "/images/bidan.png"} 
+            alt={userName || "User Image"}
+            width={40}
+            height={40}
+            className="rounded-lg border border-gray-300"
+          />
+
           <div className="text-lg font-semibold">{userName}</div>
           <FaChevronDown className="text-sm" />
         </button>

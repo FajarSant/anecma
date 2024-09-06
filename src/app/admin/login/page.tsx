@@ -88,7 +88,8 @@ function LoginPage() {
             src="/images/red-blood-cells-3.png"
             alt="Red Blood Cells"
             className="object-contain"
-            style={{ width: 270, height: 270 }}
+            width={270}
+            height={270}
           />
         </div>
       </div>

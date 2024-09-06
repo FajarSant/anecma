@@ -62,7 +62,7 @@ const Puskesmas: React.FC = () => {
           </thead>
           <tbody>
             {puskesmasData.map((item) => (
-              <tr key={item.puskesmas_id}>
+              <tr key={item.id}>
                 <td className="px-4 py-2">{item.nama_puskesmas}</td>
                 <td className="px-4 py-2">{item.alamat}</td>
                 <td className="px-4 py-2">{item.email}</td>

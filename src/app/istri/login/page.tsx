@@ -2,10 +2,10 @@ import Image from "next/image";
 import { getServerSession } from "next-auth";
 import GoogleLoginButton from "@/components/button/google-login-button";
 import { redirect } from "next/navigation";
-import { handler } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/libs/auth";
 
 export default async function LoginPage() {
-  const session = await getServerSession(handler);
+  const session = await getServerSession(authOptions);
 
   if (session) {
     redirect("/istri/dashboard");

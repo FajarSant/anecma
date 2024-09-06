@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "@/libs/axios"; 
 import Sidebar from "./components/sidebar";
-import Dashboard from "./components/dashboard";
 import Puskesmas from "./components/puskesmas";
 import Petugas from "./components/petugas";
 import TopBar from "./components/topbar";
+import HomePage from "./components/home";
 
 interface User {
   name: string;
@@ -13,18 +13,13 @@ interface User {
 }
 
 const Page: React.FC = () => {
-  const [activeMenu, setActiveMenu] = useState<string>(() => {
-    const storedMenu = localStorage.getItem("activeMenu");
-    return storedMenu || "dashboard";
-  });
-
+  const [activeMenu, setActiveMenu] = useState<string>("dashboard"); // Default ke "dashboard"
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const authToken = localStorage.getItem('authToken');
+      const authToken = localStorage.getItem('authToken'); // Tetap ambil token dari localStorage
 
       const config = {
         headers: {
@@ -38,17 +33,11 @@ const Page: React.FC = () => {
       } catch (err) {
         setError('Error fetching user data');
         console.error('Error fetching user data:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchUserData();
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("activeMenu", activeMenu);
-  }, [activeMenu]);
 
   const getTitle = () => {
     switch (activeMenu) {
@@ -68,7 +57,7 @@ const Page: React.FC = () => {
   const renderContent = () => {
     switch (activeMenu) {
       case "dashboard":
-        return <Dashboard />;
+        return <HomePage />;
       case "dataPuskesmas":
         return <Puskesmas />;
       case "dataPetugas":
@@ -80,17 +69,24 @@ const Page: React.FC = () => {
     }
   };
 
- 
   return (
     <div className="flex h-screen">
       <Sidebar setActiveMenu={setActiveMenu} activeMenu={activeMenu} />
       <div className="flex-1 flex flex-col ml-64 bg-gray-100">
+        {/* TopBar untuk menampilkan judul halaman dan informasi user */}
         <TopBar
           title={getTitle()}
           userName={user?.name || "Default User"}
           userImage={user?.image || ""}
         />
-        <div className="p-6">{renderContent()}</div>
+        <div className="p-6">
+          {/* Render konten berdasarkan activeMenu */}
+          {error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            renderContent()
+          )}
+        </div>
       </div>
     </div>
   );
