@@ -98,7 +98,7 @@ export default function ProfilPage() {
               type="text"
               id="name"
               value={userData?.name || ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -115,7 +115,7 @@ export default function ProfilPage() {
               type="text"
               id="usia"
               value={userData?.usia ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -132,7 +132,7 @@ export default function ProfilPage() {
               type="text"
               id="no_hp"
               value={userData?.no_hp ?? ""}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
               onChange={handleChange}
               readOnly={!isEditing}
@@ -147,14 +147,14 @@ export default function ProfilPage() {
 
           <Link
             href="/istri/profil/data-kehamilan"
-            className="flex flex-row items-center justify-between bg-white p-5 rounded-2xl my-2.5"
+            className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
           >
             <p>Data Kehamilan</p>
             <MdKeyboardArrowRight className="w-7 h-7" />
           </Link>
           <Link
             href="/istri/profil/data-suami"
-            className="flex flex-row items-center justify-between bg-white p-5 rounded-2xl my-2.5"
+            className="flex flex-row items-center justify-between bg-white-background p-5 rounded-2xl my-2.5"
           >
             <p>Data Suami</p>
             <MdKeyboardArrowRight className="w-7 h-7" />
