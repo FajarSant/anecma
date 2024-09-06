@@ -197,7 +197,7 @@ export default function FoodLogForm() {
       </div>
 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
-      <div className="tabs flex justify-between">
+      <div className="tabs flex  mx-5 justify-between">
         {mealOptions.map((tab) => (
           <button
             key={tab.name}
@@ -210,7 +210,7 @@ export default function FoodLogForm() {
           </button>
         ))}
       </div>
-      <div className="mt-8">
+      <div className="mt-8 mx-5">
         <MealTabContent tab={selectedTab} />
       </div>
     </div>
