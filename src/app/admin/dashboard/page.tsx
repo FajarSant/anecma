@@ -1,95 +1,216 @@
 "use client";
-import { useState, useEffect } from "react";
-import axiosInstance from "@/libs/axios"; 
-import Sidebar from "./components/sidebar";
-import Puskesmas from "./components/puskesmas";
-import Petugas from "./components/petugas";
-import TopBar from "./components/topbar";
-import HomePage from "./components/home";
 
-interface User {
-  name: string;
-  image: string;
+import React, { useEffect, useState } from "react";
+import axiosInstance from "@/libs/axios";
+import { FaSearch } from "react-icons/fa";
+import Layout from "../layout";
+
+interface DashboardData {
+  ibu_hamil: number;
+  ibu_hamil_anemia_rendah: number;
+  ibu_hamil_anemia_tinggi: number;
+  rata_rata_konsumsi_ttd: number | null;
 }
 
-const Page: React.FC = () => {
-  const [activeMenu, setActiveMenu] = useState<string>("dashboard"); // Default ke "dashboard"
-  const [user, setUser] = useState<User | null>(null);
+interface ResikoAnemia {
+  id: number;
+  user_id: number;
+  usia_kehamilan: number;
+  jumlah_anak: number;
+  riwayat_anemia: number;
+  konsumsi_ttd_7hari: number;
+  hasil_hb: number;
+  resiko: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+interface DataItem {
+  id: number;
+  name: string;
+  usia: number | null;
+  resiko_anemia: ResikoAnemia[];
+}
+
+const HomePage: React.FC = () => {
+  const [dashboardData, setDashboardData] = useState<DashboardData>({
+    ibu_hamil: 0,
+    ibu_hamil_anemia_rendah: 0,
+    ibu_hamil_anemia_tinggi: 0,
+    rata_rata_konsumsi_ttd: 0,
+  });
+  const [dataItems, setDataItems] = useState<DataItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const authToken = localStorage.getItem('authToken'); // Tetap ambil token dari localStorage
-
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${authToken}`,
-        },
-      };
-
+    const fetchData = async () => {
       try {
-        const response = await axiosInstance.get<User>('/user', config); 
-        setUser(response.data);
-      } catch (err) {
-        setError('Error fetching user data');
-        console.error('Error fetching user data:', err);
+        const authToken = localStorage.getItem("authToken");
+
+        if (!authToken) {
+          throw new Error("Authentication token not found.");
+        }
+
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${authToken}`;
+
+        // Ambil data dashboard
+        const response = await axiosInstance.get(
+          "/admin/dashboard-card-hitung-data"
+        );
+        const data = response.data.data;
+
+        setDashboardData({
+          ibu_hamil: data.ibu_hamil || 0,
+          ibu_hamil_anemia_rendah: data.ibu_hamil_anemia_rendah || 0,
+          ibu_hamil_anemia_tinggi: data.ibu_hamil_anemia_tinggi || 0,
+          rata_rata_konsumsi_ttd:
+            typeof data.rata_rata_konsumsi_ttd === "number"
+              ? data.rata_rata_konsumsi_ttd
+              : 0,
+        });
+
+        // Ambil data tabel
+        const responseItems = await axiosInstance.get(
+          "/admin/dashboard-data-terbaru"
+        );
+        setDataItems(responseItems.data.data);
+      } catch (error) {
+        console.error("Terjadi kesalahan saat mengambil data:", error);
+        setError("Gagal mengambil data. Silakan coba lagi nanti.");
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, []);
 
-  const getTitle = () => {
-    switch (activeMenu) {
-      case "dashboard":
-        return "Data Ibu Hamil";
-      case "dataPuskesmas":
-        return "Data Puskesmas";
-      case "dataPetugas":
-        return "Data Petugas";
-      case "settings":
-        return "Settings";
-      default:
-        return "Default Content";
-    }
-  };
-
-  const renderContent = () => {
-    switch (activeMenu) {
-      case "dashboard":
-        return <HomePage />;
-      case "dataPuskesmas":
-        return <Puskesmas />;
-      case "dataPetugas":
-        return <Petugas />;
-      case "settings":
-        return <h1 className="text-3xl font-bold">Settings Content</h1>;
-      default:
-        return <h1 className="text-3xl font-bold">Default Content</h1>;
-    }
-  };
+  const filteredDataItems = dataItems
+    .filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .flatMap((item) =>
+      item.resiko_anemia.map((resiko) => ({
+        ...resiko,
+        itemName: item.name,
+        usia: item.usia,
+      }))
+    );
 
   return (
-    <div className="flex h-screen">
-      <Sidebar setActiveMenu={setActiveMenu} activeMenu={activeMenu} />
-      <div className="flex-1 flex flex-col ml-64 bg-gray-100">
-        {/* TopBar untuk menampilkan judul halaman dan informasi user */}
-        <TopBar
-          title={getTitle()}
-          userName={user?.name || "Default User"}
-          userImage={user?.image || ""}
-        />
-        <div className="p-6">
-          {/* Render konten berdasarkan activeMenu */}
-          {error ? (
-            <p className="text-red-500">{error}</p>
-          ) : (
-            renderContent()
-          )}
+    <div className="p-6 bg-gray-100 min-h-screen flex flex-col">
+      {/* Dashboard Card */}
+      <div className="bg-gray-100 p-6 rounded-lg  mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className=" p-4 bg-white rounded shadow text-center">
+            <div>
+              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                Jumlah Ibu Hamil
+              </h2>
+              <p className="text-4xl">{dashboardData.ibu_hamil}</p>
+            </div>
+          </div>
+          <div className=" p-4 bg-white rounded shadow text-center">
+            <div>
+              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                Anemia Rendah
+              </h2>
+              <p className="text-4xl">
+                {dashboardData.ibu_hamil_anemia_rendah}
+              </p>
+            </div>
+          </div>
+          <div className=" p-4 bg-white rounded shadow text-center">
+            <div>
+              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                Anemia Tinggi
+              </h2>
+              <p className="text-4xl">
+                {dashboardData.ibu_hamil_anemia_tinggi}
+              </p>
+            </div>
+          </div>
+          <div className=" p-4 bg-white rounded shadow text-center">
+            <div>
+              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                Rata-rata TTD
+              </h2>
+              <p className="text-4xl">
+                {typeof dashboardData.rata_rata_konsumsi_ttd === "number" &&
+                !isNaN(dashboardData.rata_rata_konsumsi_ttd)
+                  ? dashboardData.rata_rata_konsumsi_ttd.toFixed(2)
+                  : "0.00"}
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Tabel Data */}
+      <div className="bg-white p-6 rounded-lg shadow-md flex-1">
+        <div className="flex justify-end mb-4">
+          <div className="relative w-full max-w-md">
+            <input
+              type="text"
+              placeholder="Cari..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="p-2 pr-10 w-full rounded-lg border border-gray-300 bg-white outline-none"
+            />
+            <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead className="bg-gray-200 text-black">
+              <tr>
+                <th className="px-4 py-2 text-center border-r">No</th>
+                <th className="px-4 py-2 text-center border-r">Nama</th>
+                <th className="px-4 py-2 text-center border-r">Usia</th>
+                <th className="px-4 py-2 text-center border-r">Rasio Anemia</th>
+                <th className="px-4 py-2 text-center border-r">Konsumsi TTD</th>
+                <th className="px-4 py-2 text-center border-r">HB Terakhir</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDataItems.length > 0 ? (
+                filteredDataItems.map((resiko, index) => (
+                  <tr key={resiko.id} className="hover:bg-gray-100">
+                    <td className="px-4 py-2 text-center border-b border-r">
+                      {index + 1}
+                    </td>
+                    <td className="px-4 py-2 text-center border-b border-r">
+                      {resiko.itemName}
+                    </td>
+                    <td className="px-4 py-2 text-center border-b border-r">
+                      {resiko.usia ?? "Data tidak tersedia"}
+                    </td>
+                    <td className="px-4 py-2 text-center border-b border-r">
+                      {resiko.resiko}
+                    </td>
+                    <td className="px-4 py-2 text-center border-b border-r">
+                      {resiko.konsumsi_ttd_7hari ?? "Data tidak tersedia"}
+                    </td>
+                    <td className="px-4 py-2 text-center border-b border-r">
+                      {resiko.hasil_hb ?? "Data tidak tersedia"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="px-4 py-2 text-center border-b" colSpan={6}>
+                    Tidak ada data yang tersedia
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
       </div>
     </div>
   );
 };
 
-export default Page;
+export default HomePage;

@@ -14,12 +14,20 @@ export default withAuth(
     }
 
     // Redirect untuk jalur /admin
-    // if (path.startsWith("/admin")) {
-    //   if (path === "/admin/login" && req.nextUrl.pathname !== "/admin/dashboard") {
-    //     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
-    //   }
-    // }
+    if (path.startsWith("/admin")) {
+      if (path === "/admin/login" && req.nextUrl.pathname !== "/admin/dashboard") {
+        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+      }
+    }
 
+    // Redirect untuk jalur /suami (perbaikan dari kesalahan)
+    if (path.startsWith("/suami")) {
+      if (path === "/suami/login" && req.nextUrl.pathname !== "/suami/dashboard") {
+        return NextResponse.redirect(new URL("/suami/dashboard", req.url));
+      }
+    }
+
+    // Jika tidak ada kondisi redirect yang terpenuhi, lanjutkan ke request berikutnya
     return NextResponse.next();
   },
   {
@@ -30,11 +38,11 @@ export default withAuth(
     },
     pages: {
       signIn: "/istri/login", // Mengatur halaman login untuk jalur /istri
-      // Pengaturan halaman login untuk /admin dapat menggunakan pengaturan default atau mekanisme berbeda
+      // Anda dapat menambahkan pengaturan halaman login untuk /admin dan /suami jika diperlukan
     },
   }
 );
 
 export const config = {
-  matcher: ["/istri/:path*", "/admin/:path*"],
+  matcher: ["/istri/:path*", "/admin/:path*", "/suami/:path*"], // Menambah matcher untuk /suami
 };

@@ -4,7 +4,7 @@ const nextConfig = {
         return [
             {
                 source: "/",
-                destination: "/istri/login",
+                destination: "/pilih-gender",
                 permanent: false,
             }
         ]

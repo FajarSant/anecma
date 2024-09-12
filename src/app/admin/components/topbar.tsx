@@ -1,5 +1,7 @@
+"use client";
+
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown } from "react-icons/fa";
 
 interface TopBarProps {
@@ -33,21 +35,20 @@ const TopBar: React.FC<TopBarProps> = ({ title, userName, userImage }) => {
   }, []);
 
   return (
-    <div className="p-4 flex justify-between bg-gray-100 items-center">
+    <div className="p-4 flex justify-between  items-center">
       <h1 className="text-xl font-bold">{title}</h1>
-      <div className="flex items-center space-x-4 relative bg-white rounded-lg">
+      <div className="flex items-center space-x-4  relative bg-white rounded-lg">
         <button
           onClick={toggleDropdown}
-          className="flex items-center space-x-2 p-1 rounded-lg"
+          className="flex items-center space-x-2 p-1 rounded-sm"
         >
           <Image
-            src={userImage || "/images/bidan.png"} 
+            src={userImage || "/images/bidan.png"}
             alt={userName || "User Image"}
             width={40}
             height={40}
-            className="rounded-lg border border-gray-300"
+            className="w-10 h-10"
           />
-
           <div className="text-lg font-semibold">{userName}</div>
           <FaChevronDown className="text-sm" />
         </button>

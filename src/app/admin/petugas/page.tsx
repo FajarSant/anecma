@@ -1,8 +1,10 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { FaPlus, FaRegUser, FaMale, FaFemale } from "react-icons/fa";
 import { BiSolidEdit } from "react-icons/bi";
 import { CiTrash } from "react-icons/ci";
 import axiosInstance from "@/libs/axios";
+import Layout from "../layout";
 
 interface PuskesmasData {
   id: number;
@@ -41,11 +43,14 @@ const Petugas: React.FC = () => {
       const token = localStorage.getItem("authToken");
 
       try {
-        const response = await axiosInstance.get("/admin/data-petugas-puskesmas", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axiosInstance.get(
+          "/admin/data-petugas-puskesmas",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (Array.isArray(response.data.data)) {
           setData(response.data.data);
@@ -60,28 +65,47 @@ const Petugas: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (newPetugas.name && newPetugas.email) {
-      setData([
-        ...data,
-        {
-          ...newPetugas,
-          id: data.length + 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          puskesmas: newPetugas.puskesmas || [],
-        } as PetugasData,
-      ]);
-      setShowAddModal(false);
-      setNewPetugas({
-        name: "",
-        email: "",
-        role: "petugas",
-        gender: "Laki-laki",
-        puskesmas: [],
-      });
+      try {
+        // Simulate an API request to add new petugas
+        const response = await axiosInstance.post(
+          "/admin/add-petugas",
+          newPetugas,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setData([
+            ...data,
+            {
+              ...newPetugas,
+              id: data.length + 1,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              puskesmas: newPetugas.puskesmas || [],
+            } as PetugasData,
+          ]);
+        } else {
+          console.error("Failed to add petugas");
+        }
+        setShowAddModal(false);
+        setNewPetugas({
+          name: "",
+          email: "",
+          role: "petugas",
+          gender: "Laki-laki",
+          puskesmas: [],
+        });
+      } catch (error) {
+        console.error("Error adding petugas:", error);
+      }
     } else {
-      alert("Please fill in all fields");
+      console.error("Please fill in all fields");
     }
   };
 
@@ -98,7 +122,7 @@ const Petugas: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Daftar Petugas</h1>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center"
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center"
             onClick={() => setShowAddModal(true)}
           >
             <FaPlus className="mr-2" />
@@ -155,9 +179,7 @@ const Petugas: React.FC = () => {
                       <CiTrash className="text-lg" />
                     </button>
                   </td>
-                  <td className={`px-4 py-2 text-green-500`}>
-                    Aktif
-                  </td>
+                  <td className={`px-4 py-2 text-green-500`}>Aktif</td>
                 </tr>
               ))}
             </tbody>

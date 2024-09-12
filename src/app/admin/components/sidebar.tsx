@@ -1,15 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { FaHospitalAlt, FaUserMd, FaCog } from "react-icons/fa";
-import { LuLayoutDashboard } from "react-icons/lu";
-import Image from "next/image";
-import axiosInstance from "@/libs/axios"; 
 
-interface SidebarProps {
-  setActiveMenu: (menu: string) => void;
-  activeMenu: string;
-}
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { FaHospitalAlt, FaUserMd, FaCog } from 'react-icons/fa';
+import { LuLayoutDashboard } from 'react-icons/lu';
+import Image from 'next/image';
+import axiosInstance from '@/libs/axios';
 
 interface User {
   name: string;
@@ -17,7 +13,11 @@ interface User {
   role: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, activeMenu }) => {
+interface SidebarProps {
+  currentPath: string; // Add currentPath prop to Sidebar
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,20 +50,19 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, activeMenu }) => {
     fetchUserData();
   }, []);
 
-  const handleMenuClick = (menu: string) => {
-    setActiveMenu(menu);
-    localStorage.setItem('activeMenu', menu); // Simpan activeMenu ke localStorage
+  const isActive = (path: string) => {
+    return currentPath === path ? 'bg-indigo-400 text-white' : 'hover:bg-indigo-300';
   };
 
   return (
-    <div className="fixed top-0 left-0 bg-white w-64 h-screen flex flex-col shadow-lg border-r">
+    <div className="fixed top-0 left-0 bg-white  w-64 h-screen flex flex-col shadow-lg border-r">
       <div className="p-4 flex items-center border-b">
         {error ? (
           <p className="text-red-500">{error}</p>
         ) : (
           <>
             <Image
-              src={user?.image || "/default-image.jpg"}
+              src={user?.image || "/image/bidan.png"}
               alt="User"
               width={56}
               height={56}
@@ -80,60 +79,32 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveMenu, activeMenu }) => {
       <nav className="flex-1 p-6">
         <ul>
           <li className="mb-6">
-            <Link href="#">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left transition-colors ${
-                  activeMenu === "dashboard"
-                    ? "bg-blue-700 text-white"
-                    : "hover:bg-blue-200"
-                }`}
-                onClick={() => handleMenuClick("dashboard")}
-              >
+            <Link href="/admin/dashboard">
+              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/dashboard')}`}>
                 <LuLayoutDashboard className="text-xl mr-3" />
                 <span className="text-lg">Dashboard</span>
               </span>
             </Link>
           </li>
           <li className="mb-6">
-            <Link href="#">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left transition-colors ${
-                  activeMenu === "dataPuskesmas"
-                    ? "bg-blue-700 text-white"
-                    : "hover:bg-blue-200"
-                }`}
-                onClick={() => handleMenuClick("dataPuskesmas")}
-              >
+            <Link href="/admin/puskesmas">
+              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/puskesmas')}`}>
                 <FaHospitalAlt className="text-xl mr-3" />
                 <span className="text-lg">Data Puskesmas</span>
               </span>
             </Link>
           </li>
           <li className="mb-6">
-            <Link href="#">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left transition-colors ${
-                  activeMenu === "dataPetugas"
-                    ? "bg-blue-700 text-white"
-                    : "hover:bg-blue-200"
-                }`}
-                onClick={() => handleMenuClick("dataPetugas")}
-              >
+            <Link href="/admin/petugas">
+              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/petugas')}`}>
                 <FaUserMd className="text-xl mr-3" />
                 <span className="text-lg">Data Petugas</span>
               </span>
             </Link>
           </li>
           <li>
-            <Link href="#">
-              <span
-                className={`flex items-center p-2 rounded-xl w-full text-left transition-colors ${
-                  activeMenu === "settings"
-                    ? "bg-blue-700 text-white"
-                    : "hover:bg-blue-200"
-                }`}
-                onClick={() => handleMenuClick("settings")}
-              >
+            <Link href="/admin/settings">
+              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/settings')}`}>
                 <FaCog className="text-xl mr-3" />
                 <span className="text-lg">Settings</span>
               </span>
