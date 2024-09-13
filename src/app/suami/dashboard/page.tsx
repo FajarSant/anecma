@@ -2,6 +2,7 @@
 import { FaCircle, FaUser, FaCalendar, FaRegBell } from 'react-icons/fa';
 import { MdPregnantWoman } from 'react-icons/md';
 import Image from 'next/image';
+import Layout from '../layout';
 
 // Define the placeholder data for suami and istri
 const userDataSuami = {
@@ -19,6 +20,7 @@ const userDataIstri = {
 
 const DashboardSuami = () => {
   return (
+    <Layout>
     <main className="bg-gray-50 min-h-screen">
       {/* Header Suami */}
       <div className="m-5">
@@ -90,6 +92,7 @@ const DashboardSuami = () => {
         </div>
       </div>
     </main>
+    </Layout>
   );
 };
 
