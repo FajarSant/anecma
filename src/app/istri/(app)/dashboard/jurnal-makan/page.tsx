@@ -25,7 +25,7 @@ const portionSizes = {
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
-  lauk_hewani: [
+  laukHewani: [
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -35,7 +35,7 @@ const portionSizes = {
     { value: "3.5", label: "3.5 Porsi" },
     { value: "4", label: "4 Porsi" },
   ],
-  lauk_nabati: [
+  laukNabati: [
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -58,44 +58,19 @@ const portionSizes = {
 // Gambar kategori makanan
 const mealCategories = {
   karbohidrat: [
-    {
-      src: "/images/nasi-1-piring.jpg",
-      alt: "Nasi 1 Piring",
-      title: "Nasi",
-      description: "1 Piring Kecil",
-    },
+    { src: "/images/nasi-1-piring.jpg", alt: "Nasi 1 Piring", title: "Nasi", description: "1 Piring Kecil" },
   ],
-  lauk_hewani: [
-    {
-      src: "/images/ikan-lele.jpg",
-      alt: "Ikan-Lele",
-      title: "Ikan Lele",
-      description: "1/3 sedang ikan Lele",
-    },
+  laukHewani: [
+    { src: "/images/ikan-lele.jpg", alt: "Ikan-Lele", title: "Ikan Lele", description: "1/3 sedang ikan Lele " },
   ],
-  lauk_nabati: [
-    {
-      src: "/images/tahu.jpg",
-      alt: "Tahu",
-      title: "Tahu",
-      description: "2 Potong Sedang",
-    },
+  laukNabati: [
+    { src: "/images/tahu.jpg", alt: "Tahu", title: "Tahu", description: "2 Potong Sedang" },
   ],
   sayur: [
-    {
-      src: "/images/5-sendok-makan.jpg",
-      alt: "Sayur",
-      title: "Sayur",
-      description: "5 Sendok Makan",
-    },
+    { src: "/images/5-sendok-makan.jpg", alt: "Sayur", title: "Sayur", description: "5 Sendok Makan" },
   ],
   buah: [
-    {
-      src: "/images/semangka.jpg",
-      alt: "Semangka",
-      title: "Semangka",
-      description: "2 Potong Sedang Semangka",
-    },
+    { src: "/images/semangka.jpg", alt: "Semangka", title: "Semangka", description: "2 Potong Sedang Semangka" },
   ],
 };
 
