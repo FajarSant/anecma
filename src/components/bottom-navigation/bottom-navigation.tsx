@@ -2,8 +2,8 @@
 
 import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
-import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
+import { IoChatbubblesOutline } from "react-icons/io5";
 import NavLink from "./nav-link";
 import { usePathname } from "next/navigation";
 
