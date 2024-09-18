@@ -25,7 +25,7 @@ const portionSizes = {
     { value: "1.5", label: "1.5 Porsi" },
     { value: "2", label: "2 Porsi" },
   ],
-  laukHewani: [
+  lauk_hewani: [
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -35,7 +35,7 @@ const portionSizes = {
     { value: "3.5", label: "3.5 Porsi" },
     { value: "4", label: "4 Porsi" },
   ],
-  laukNabati: [
+  lauk_nabati: [
     { value: "0.5", label: "0.5 Porsi" },
     { value: "1", label: "1 Porsi" },
     { value: "1.5", label: "1.5 Porsi" },
@@ -60,10 +60,10 @@ const mealCategories = {
   karbohidrat: [
     { src: "/images/nasi-1-piring.jpg", alt: "Nasi 1 Piring", title: "Nasi", description: "1 Piring Kecil" },
   ],
-  laukHewani: [
+  lauk_hewani: [
     { src: "/images/ikan-lele.jpg", alt: "Ikan-Lele", title: "Ikan Lele", description: "1/3 sedang ikan Lele " },
   ],
-  laukNabati: [
+  lauk_nabati: [
     { src: "/images/tahu.jpg", alt: "Tahu", title: "Tahu", description: "2 Potong Sedang" },
   ],
   sayur: [
@@ -107,22 +107,27 @@ const FoodLogForm = () => {
               headers: { Authorization: `Bearer ${session.accessToken}` },
             }
           );
-          const fetchedData = response.data.data; // Assuming the data you're interested in is in `data`
-          setJurnalMakanData(fetchedData);
-
-          // Set initial selected portions based on fetched data
-          const initialPortions = Object.keys(mealCategories).reduce(
-            (acc, category) => {
-              const apiKey = `${selectedTab}_${category}`.replace(/-/g, "_");
-              acc[category] = mapPortionValue(fetchedData[apiKey] || 0);
-              return acc;
-            },
-            {} as Record<string, string>
-          );
-          setSelectedPortions(initialPortions);
+          const fetchedData = response.data.data; // Mengambil data yang diperlukan
+          
+          // Cek jika data kosong
+          if (!fetchedData || Object.keys(fetchedData).length === 0) {
+            console.log("Data jurnal makanan belum ada.");
+          } else {
+            setJurnalMakanData(fetchedData);
+  
+            // Set initial selected portions based on fetched data
+            const initialPortions = Object.keys(mealCategories).reduce(
+              (acc, category) => {
+                const apiKey = `${selectedTab}_${category}`.replace(/-/g, "_");
+                acc[category] = mapPortionValue(fetchedData[apiKey] || 0);
+                return acc;
+              },
+              {} as Record<string, string>
+            );
+            setSelectedPortions(initialPortions);
+          }
         } catch (error) {
           console.error("Error fetching Jurnal Makan data:", error);
-          setError("Failed to load Jurnal Makan data.");
         } finally {
           setLoading(false);
         }
@@ -131,10 +136,10 @@ const FoodLogForm = () => {
         setLoading(false);
       }
     }
-
+  
     fetchJurnalMakanData();
   }, [session, status, selectedTab]);
-
+  
   const getCheckedValue = (category: string) => {
     return selectedPortions[category] || "";
   };
@@ -152,41 +157,53 @@ const FoodLogForm = () => {
         const currentMealOption = mealOptions.find(option => option.name === selectedTab);
         const jamMakan = currentMealOption?.jam_makan;
   
-        // Gunakan string untuk semua nilai
+        // Format data yang akan dikirim berdasarkan porsi yang dipilih oleh user
         const formattedData = Object.keys(selectedPortions).reduce((acc, category) => {
           acc[`${jamMakan}_${category}`] = selectedPortions[category] || ""; // Tetap string
           return acc;
-        }, {} as Record<string, string>); // Ubah tipe di sini
+        }, {} as Record<string, string>);
   
         // Tambahkan jam_makan ke dalam data yang akan dikirim
         formattedData.jam_makan = jamMakan || "";
   
-        // Hitung total kalori jika diperlukan
-        const totalKalori = Object.values(selectedPortions)
+        // Hitung kalori dari porsi saat ini (data yang baru ditambahkan)
+        const currentMealCalories = Object.values(selectedPortions)
           .reduce((sum, value) => sum + parseFloat(value || "0"), 0);
   
-        // Tambahkan total kalori ke dalam data yang akan dikirim
-        formattedData.total_kalori = totalKalori.toString(); // Ubah total kalori menjadi string
+        // Ambil total kalori sebelumnya
+        let totalKalori = 0;
+        if (jurnalMakanData?.total_kalori) {
+          totalKalori = parseFloat(jurnalMakanData.total_kalori || "0");
+        }
+  
+        // Tambahkan kalori baru dari waktu makan saat ini
+        totalKalori += currentMealCalories;
+  
+        // Simpan total kalori baru untuk waktu makan saat ini
+        formattedData[`${jamMakan}_total_kalori`] = currentMealCalories.toString();
+  
+        // Simpan total semua kalori (termasuk dari waktu makan sebelumnya)
+        formattedData.total_kalori = totalKalori.toString();
   
         // Tambahkan console.log untuk melihat data yang akan dikirim
         console.log("Data yang akan dikirim ke API:", formattedData);
   
+        // Kirim data ke API
         await axiosInstance.post(
           "/istri/dashboard/jurnal-makan",
-          formattedData, // Kirim data porsi terpilih ke server
+          formattedData,
           {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
         );
-        alert("Data berhasil disimpan!");
       } catch (error) {
         console.error("Error saving data:", error);
-        alert("Gagal menyimpan data.");
       }
     } else {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
+  
   
   const categories = Object.keys(mealCategories) as Array<
     keyof typeof mealCategories
