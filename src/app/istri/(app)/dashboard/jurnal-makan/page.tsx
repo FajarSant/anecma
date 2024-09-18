@@ -176,8 +176,29 @@ const FoodLogForm = () => {
           totalKalori = parseFloat(jurnalMakanData.total_kalori || "0");
         }
   
-        // Tambahkan kalori baru dari waktu makan saat ini
-        totalKalori += currentMealCalories;
+        // Ambil data porsi sebelumnya untuk waktu makan ini (jika ada)
+        const previousPortions = jurnalMakanData
+          ? Object.keys(selectedPortions).reduce((acc, category) => {
+              const key = `${jamMakan}_${category}`;
+              acc[category] = parseFloat(jurnalMakanData[key] || "0");
+              return acc;
+            }, {} as Record<string, number>)
+          : {};
+  
+        const previousMealCalories = Object.values(previousPortions).reduce((sum, value) => sum + value, 0);
+  
+        // Hitung selisih antara kalori baru dan kalori lama
+        const calorieDifference = currentMealCalories - previousMealCalories;
+  
+        // // Tampilkan data sebelumnya dan sesudahnya di console
+        // console.log("Data sebelumnya:", previousPortions);
+        // console.log(`Jumlah kalori sebelumnya: ${previousMealCalories}`);
+        // console.log("Data sesudah diedit:", selectedPortions);
+        // console.log(`Jumlah kalori sesudah diedit: ${currentMealCalories}`);
+        // console.log(`Perubahan kalori: ${calorieDifference > 0 ? '+' : ''}${calorieDifference}`);
+  
+        // Tambahkan atau kurangi total kalori dengan selisih yang dihasilkan
+        totalKalori += calorieDifference;
   
         // Simpan total kalori baru untuk waktu makan saat ini
         formattedData[`${jamMakan}_total_kalori`] = currentMealCalories.toString();
@@ -185,7 +206,7 @@ const FoodLogForm = () => {
         // Simpan total semua kalori (termasuk dari waktu makan sebelumnya)
         formattedData.total_kalori = totalKalori.toString();
   
-        // Tambahkan console.log untuk melihat data yang akan dikirim
+        // Tampilkan hasil akhir yang akan dikirim
         console.log("Data yang akan dikirim ke API:", formattedData);
   
         // Kirim data ke API
