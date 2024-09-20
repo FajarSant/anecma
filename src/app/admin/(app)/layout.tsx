@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Sidebar from './components/sidebar'; // Adjust the import path as needed
-import TopBar from './components/topbar'; // Adjust the import path as needed
+import Sidebar from '../components/sidebar'; // Adjust the import path as needed
+import TopBar from '../components/topbar'; // Adjust the import path as needed
 import { usePathname } from 'next/navigation'; // For App Router
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
