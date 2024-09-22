@@ -1,10 +1,10 @@
-"use client";
+"use client"
 import React, { useState, useEffect } from "react";
 import { FaPlus, FaRegUser, FaMale, FaFemale } from "react-icons/fa";
 import { BiSolidEdit } from "react-icons/bi";
 import { CiTrash } from "react-icons/ci";
 import axiosInstance from "@/libs/axios";
-import Layout from "../layout";
+import AddPetugasModal from "./addpetugas"; // Import modal
 
 interface PuskesmasData {
   id: number;
@@ -33,7 +33,7 @@ const Petugas: React.FC = () => {
   const [newPetugas, setNewPetugas] = useState<Partial<PetugasData>>({
     name: "",
     email: "",
-    role: "petugas",
+    role: "",
     gender: "Laki-laki",
     puskesmas: [],
   });
@@ -43,14 +43,11 @@ const Petugas: React.FC = () => {
       const token = localStorage.getItem("authToken");
 
       try {
-        const response = await axiosInstance.get(
-          "/admin/data-petugas-puskesmas",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/admin/data-petugas-puskesmas", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (Array.isArray(response.data.data)) {
           setData(response.data.data);
@@ -68,16 +65,11 @@ const Petugas: React.FC = () => {
   const handleAdd = async () => {
     if (newPetugas.name && newPetugas.email) {
       try {
-        // Simulate an API request to add new petugas
-        const response = await axiosInstance.post(
-          "/admin/add-petugas",
-          newPetugas,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+        const response = await axiosInstance.post("/admin/add-petugas", newPetugas, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
 
         if (response.data.success) {
           setData([
@@ -109,9 +101,7 @@ const Petugas: React.FC = () => {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewPetugas({ ...newPetugas, [name]: value });
   };
@@ -122,7 +112,7 @@ const Petugas: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Daftar Petugas</h1>
           <button
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center"
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
             onClick={() => setShowAddModal(true)}
           >
             <FaPlus className="mr-2" />
@@ -160,22 +150,13 @@ const Petugas: React.FC = () => {
                     ))}
                   </td>
                   <td className="px-4 py-2">
-                    <button
-                      className="text-purple-500 mr-2"
-                      aria-label="Edit Petugas"
-                    >
+                    <button className="text-purple-500 mr-2" aria-label="Edit Petugas">
                       <BiSolidEdit className="text-lg" />
                     </button>
-                    <button
-                      className="text-blue-500 mr-2"
-                      aria-label="View User"
-                    >
+                    <button className="text-blue-500 mr-2" aria-label="View User">
                       <FaRegUser className="text-lg" />
                     </button>
-                    <button
-                      className="text-red-500"
-                      aria-label="Delete Petugas"
-                    >
+                    <button className="text-red-500" aria-label="Delete Petugas">
                       <CiTrash className="text-lg" />
                     </button>
                   </td>
@@ -187,59 +168,14 @@ const Petugas: React.FC = () => {
         </div>
       </div>
 
-      {showAddModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-semibold mb-4">Tambah Petugas</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Nama</label>
-              <input
-                type="text"
-                name="name"
-                value={newPetugas.name}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={newPetugas.email}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Gender</label>
-              <select
-                name="gender"
-                value={newPetugas.gender}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded"
-              >
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
-              </select>
-            </div>
-            <div className="flex justify-end">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2"
-                onClick={handleAdd}
-              >
-                Tambah
-              </button>
-              <button
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
-                onClick={() => setShowAddModal(false)}
-              >
-                Batal
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal untuk tambah petugas */}
+      <AddPetugasModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        newPetugas={newPetugas}
+        handleChange={handleChange}
+        handleAdd={handleAdd}
+      />
     </div>
   );
 };
