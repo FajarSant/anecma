@@ -1,13 +1,74 @@
+"use client";
+import { useState, useEffect } from "react";
 import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
+import toast, { Toaster } from "react-hot-toast";
+import axiosInstance from "@/libs/axios";
+import { useSession } from "next-auth/react";
+import { AxiosError } from "axios"; // Ensure you have axios installed
 
 export default function RiwayatPage() {
+  const [nilaiHb, setNilaiHb] = useState<string>(""); 
+  const { data: session, status } = useSession();
+  const [currentDate, setCurrentDate] = useState<string>(""); 
+
+  useEffect(() => {
+    const date = new Date();
+    setCurrentDate(date.toLocaleString("id-ID", {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }));
+  }, []);
+
+  const handleSubmit = async () => {
+    if (status === "authenticated" && session?.accessToken) {
+      if (!nilaiHb) {
+        toast.error("Nilai HB tidak boleh kosong.");
+        return;
+      }
+      const numericNilaiHb = parseFloat(nilaiHb);
+      if (isNaN(numericNilaiHb)) {
+        toast.error("Nilai HB harus berupa angka.");
+        return;
+      }
+
+      try {
+        const response = await axiosInstance.post(
+          "/istri/dashboard/insert-riwayat-hb",
+          { nilai_hb: numericNilaiHb }, 
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}` 
+            }
+          }
+        );
+        console.log("Response:", response.data);
+        toast.success("Data HB terbaru berhasil disimpan!");
+        setNilaiHb(""); 
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        if (error instanceof AxiosError && error.response) {
+          toast.error(error.response.data.message || "Gagal menyimpan data HB terbaru.");
+        } else {
+          toast.error("Gagal menyimpan data HB terbaru.");
+        }
+      }
+    } else {
+      toast.error("Silakan login untuk menyimpan data.");
+    }
+  };
+
   return (
     <main>
-      {/* Header */}
       <div className="m-5 flex flex-row">
+        <Toaster position="top-center" reverseOrder={false} />
         <p className="text-2xl font-bold">Riwayat HB</p>
       </div>
 
@@ -19,7 +80,9 @@ export default function RiwayatPage() {
             <input
               type="text"
               id="nilai_hb"
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              value={nilaiHb}
+              onChange={(e) => setNilaiHb(e.target.value)} // Update state on input change
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               placeholder=" "
             />
             <label
@@ -39,7 +102,8 @@ export default function RiwayatPage() {
             </button>
             <button
               type="button"
-              className="text-white bg-green-pastel hover:bg-green-pastel/80 focus:outline-none focus:ring-4 focus:ring-green-pastel/30 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2"
+              onClick={handleSubmit}
+              className="text-white bg-green-pastel hover:bg-green-pastel/80 focus:outline-none focus:ring-4 focus:ring-green-pastel/30 font-medium rounded-full text-sm px-5 py-2.5 text-center"
             >
               Simpan
             </button>
@@ -47,7 +111,6 @@ export default function RiwayatPage() {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
           <button
@@ -55,36 +118,28 @@ export default function RiwayatPage() {
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
             <FaHome className="w-5 h-5 mb-2 text-blue-600 dark:text-blue-500" />
-            <span className="text-sm text-blue-600 dark:text-blue-500">
-              Home
-            </span>
+            <span className="text-sm text-blue-600 dark:text-blue-500">Home</span>
           </button>
           <button
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
             <FiBook className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Edukasi
-            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">Edukasi</span>
           </button>
           <button
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
             <IoChatbubblesOutline className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Konsultasi
-            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">Konsultasi</span>
           </button>
           <button
             type="button"
             className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
           >
             <LuUsers className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Profil
-            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">Profil</span>
           </button>
         </div>
       </div>

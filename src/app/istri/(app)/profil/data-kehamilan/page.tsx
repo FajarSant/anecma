@@ -90,27 +90,32 @@ export default function ProfilPage() {
           <p className="text-red-500">{error}</p>
         ) : (
           <form className="flex flex-col gap-2.5">
-            <div className="relative my-2.5">
-              <input
-                type="text"
-                id="hari_pertama_haid"
-                className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                placeholder=" "
-                value={
-                  isEditing
-                    ? editableData?.hari_pertama_haid || ""
-                    : userData?.hari_pertama_haid || ""
-                }
-                onChange={handleChange}
-                disabled={!isEditing}
-              />
-              <label
-                htmlFor="hari_pertama_haid"
-                className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
-              >
-                Hari Pertama Haid
-              </label>
-            </div>
+  <div className="relative my-2.5">
+  <input
+    type="date" // Keep the date input type for date picker functionality
+    id="hari_pertama_haid"
+    className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+    placeholder=" "
+    value={
+      isEditing
+        ? editableData?.hari_pertama_haid || ""
+        : userData?.hari_pertama_haid || ""
+    }
+    onChange={handleChange}
+    disabled={!isEditing}
+    onClick={(e) => {
+      // Open date picker when input is clicked
+      e.currentTarget.showPicker();
+    }}
+  />
+  <label
+    htmlFor="hari_pertama_haid"
+    className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+  >
+    Hari Pertama Haid
+  </label>
+</div>
+
             <div className="relative my-2.5">
               <input
                 type="text"

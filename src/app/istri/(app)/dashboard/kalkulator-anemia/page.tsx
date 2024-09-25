@@ -6,13 +6,10 @@ import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
-import { useSession } from "next-auth/react";
-import axiosInstance from '@/libs/axios';
-import axios from 'axios';
 
 const anemiaOptions = [
-  { value: "0", label: "Tidak Punya" },
-  { value: "1", label: "Punya" },
+  { value: "0", label: "Rendah" },
+  { value: "1", label: "Tinggi" },
 ];
 
 export default function KalkulatorAnemiaPage() {
@@ -24,36 +21,7 @@ export default function KalkulatorAnemiaPage() {
     riwayat_anemia: "0" // Default to "Tidak Punya"
   });
 
-  const [userId, setUserId] = useState<string | null>(null);
-  const { data: session, status } = useSession();
   const router = useRouter();
-
-  useEffect(() => {
-    async function fetchUserData() {
-      if (status === "authenticated" && session?.accessToken) {
-        console.log("Access Token:", session.accessToken); 
-
-        try {
-          const response = await axiosInstance.get("/istri/get-user", {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-
-          // console.log("Full API Response:", response); 
-          // console.log("Response Data:", response.data); 
-
-          if (response.data && response.data.data && response.data.data.id) {
-            console.log("User ID:", response.data.data.id); 
-            setUserId(response.data.data.id.toString()); 
-          } else {
-            console.error("User object or user ID is undefined in response data", response.data);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      }
-    }
-    fetchUserData();
-  }, [session, status]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -63,49 +31,13 @@ export default function KalkulatorAnemiaPage() {
     }));
   };
 
-  const handleSubmit = async () => {
-    if (!userId) {
-      console.error("User ID is not available");
-      return;
-    }
-  
-    if (!session?.accessToken) {
-      console.error("Access Token is not available");
-      return;
-    }
-  
-    // Gabungkan data menjadi satu objek
-    const dataToSend = {
-      user_id: userId,
-      usia_kehamilan: formData.usia_kehamilan,
-      jumlah_anak: formData.jumlah_anak,
-      riwayat_anemia: formData.riwayat_anemia,
-      konsumsi_ttd_7hari: formData.jumlah_konsumsi_ttd_terakhir,
-      hasil_hb: formData.hasil_pemeriksaan_hb_terakhir,
-      resiko: formData.riwayat_anemia,
-    };
-  
-    console.log("Data to send:", dataToSend);
-  
-    try {
-      const response = await axiosInstance.post('/istri/dashboard/kalkulator-anemia', dataToSend, {
-        headers: {
-          Authorization: `Bearer ${session.accessToken}`,
-        },
-      });
-  
-      console.log("Response Data:", response.data);
-      localStorage.setItem('formData', JSON.stringify(dataToSend));
-      router.push('/istri/dashboard/kalkulator-anemia/hasil');
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error submitting data:", error.response?.data || error.message);
-      } else if (error instanceof Error) {
-        console.error("Error submitting data:", error.message);
-      } else {
-        console.error("An unknown error occurred.");
-      }
-    }
+  const handleSubmit = () => {
+    // Save form data to localStorage
+    localStorage.setItem('formData', JSON.stringify(formData));
+    console.log("Form data saved to localStorage:", formData);
+    
+    // Navigate to the results page
+    router.push('/istri/dashboard/kalkulator-anemia/hasil');
   };
   
   return (
@@ -135,7 +67,7 @@ export default function KalkulatorAnemiaPage() {
                 </select>
                 <label
                   htmlFor={id}
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                 >
                   {id.replace(/_/g, " ").toUpperCase()}
                 </label>
@@ -152,9 +84,9 @@ export default function KalkulatorAnemiaPage() {
                 />
                 <label
                   htmlFor={id}
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                 >
-                  {id.replace(/_/g, " ").toUpperCase()}
+                  {id === "usia_kehamilan" ? "Usia Kehamilan(Minggu)" : id.replace(/_/g, " ").toUpperCase()}
                 </label>
               </div>
             )
@@ -172,6 +104,7 @@ export default function KalkulatorAnemiaPage() {
         </form>
       </div>
 
+      {/* Bottom navigation */}
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
           <button
@@ -207,7 +140,7 @@ export default function KalkulatorAnemiaPage() {
           >
             <LuUsers className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
             <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Profil
+              Komunitas
             </span>
           </button>
         </div>

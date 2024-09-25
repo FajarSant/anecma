@@ -14,7 +14,6 @@ declare module "next-auth" {
   }
 }
 
-
 // Define the userData interface
 interface UserData {
   name: string;
@@ -25,8 +24,9 @@ export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-console.log("session", session);
+
+  console.log("session", session);
+
   useEffect(() => {
     async function fetchUserData() {
       if (status === "authenticated" && session?.accessToken) {
@@ -49,7 +49,6 @@ console.log("session", session);
 
     fetchUserData();
   }, [session, status]);
-
 
   return (
     <main>
@@ -98,27 +97,27 @@ console.log("session", session);
       {/* Main Menu */}
       <div className="grid grid-cols-2 mx-5 mb-20 gap-5">
         <Link href="/istri/dashboard/kalkulator-anemia">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/90">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-light border border-gray-200 rounded-lg shadow hover:bg-blue-light/80 hover:shadow-lg transition duration-300 ease-in-out">
             <p className="text-white font-bold">Kalkulator Anemia</p>
           </div>
         </Link>
         <Link href="/istri/dashboard/jurnal-makan">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-green-pastel border border-gray-200 rounded-lg shadow hover:bg-green-pastel/90">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-green-pastel border border-green-200 rounded-lg shadow hover:bg-green-pastel/80 hover:shadow-lg transition duration-300 ease-in-out">
             <p className="text-white font-bold">Jurnal Makan</p>
           </div>
         </Link>
         <Link href="/istri/dashboard/reminder-ttd">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-white border border-gray-200 rounded-lg shadow hover:bg-green-pastel/90">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-white border border-blue-200 rounded-lg shadow hover:bg-blue-white/80 hover:shadow-lg transition duration-300 ease-in-out">
             <p className="text-white font-bold">Reminder TTD</p>
           </div>
         </Link>
         <Link href="/istri/dashboard/konsumsi-ttd">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-gray-white border border-gray-200 rounded-lg shadow hover:bg-green-pastel/90">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-gray-white border border-gray-200 rounded-lg shadow hover:bg-gray-white/80 hover:shadow-lg transition duration-300 ease-in-out">
             <p className="text-white font-bold">Konsumsi TTD</p>
           </div>
         </Link>
         <Link href="/istri/dashboard/riwayat">
-          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-sky border border-gray-200 rounded-lg shadow hover:bg-green-pastel/90">
+          <div className="flex flex-row items-end max-w-sm min-h-28 p-4 bg-blue-sky border border-gray-200 rounded-lg shadow hover:bg-blue-sky/80 hover:shadow-lg transition duration-300 ease-in-out">
             <p className="text-white font-bold">Riwayat HB</p>
           </div>
         </Link>

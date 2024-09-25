@@ -135,40 +135,57 @@ const FoodLogForm = () => {
 
   useEffect(() => {
     async function fetchJurnalMakanData() {
-      if (status === "authenticated" && session?.accessToken) {
-        try {
-          const response = await axiosInstance.get(
-            "/istri/dashboard/get-jurnal-makan",
-            {
-              headers: { Authorization: `Bearer ${session.accessToken}` },
-            }
-          );
-          const fetchedData = response.data.data; // Mengambil data yang diperlukan
-          
-          // Cek jika data kosong
-          if (!fetchedData || Object.keys(fetchedData).length === 0) {
-            console.log("Data jurnal makanan belum ada.");
-          } else {
-            setJurnalMakanData(fetchedData);
-  
-            // Set initial selected portions based on fetched data
-            const initialPortions = Object.keys(mealCategories).reduce(
-              (acc, category) => {
-                const apiKey = `${selectedTab}_${category}`.replace(/-/g, "_");
-                acc[category] = mapPortionValue(fetchedData[apiKey] || 0);
-                return acc;
-              },
-              {} as Record<string, string>
-            );
-            setSelectedPortions(initialPortions);
-          }
-        } catch (error) {
-          console.error("Error fetching Jurnal Makan data:", error);
-        } finally {
-          setLoading(false);
+      // Pastikan user sudah terotentikasi dan accessToken tersedia
+      if (status !== "authenticated" || !session?.accessToken) {
+        if (status === "unauthenticated") {
+          setError("Anda perlu login terlebih dahulu.");
         }
-      } else if (status === "unauthenticated") {
-        setError("You need to be logged in.");
+        setLoading(false);
+        return; // Hentikan eksekusi jika user tidak terotentikasi
+      }
+  
+      try {
+        setLoading(true); // Set loading state saat mulai fetch data
+  
+        const response = await axiosInstance.get(
+          "/istri/dashboard/get-jurnal-makan",
+          {
+            headers: { Authorization: `Bearer ${session.accessToken}` },
+          }
+        );
+        
+        const fetchedData = response.data.data; // Mengambil data yang diperlukan
+        console.log("Data jurnal makanan:", fetchedData);
+  
+        // Cek jika data kosong
+        if (!fetchedData || Object.keys(fetchedData).length === 0) {
+          console.log("Data jurnal makanan belum ada.");
+          setError("Data jurnal makanan belum tersedia.");
+          return;
+        }
+  
+        // Set data ke state
+        setJurnalMakanData(fetchedData);
+  
+        // Set initial selected portions based on fetched data
+        if (mealCategories && typeof mealCategories === 'object') {
+          const initialPortions = Object.keys(mealCategories).reduce(
+            (acc, category) => {
+              const apiKey = `${selectedTab}_${category}`.replace(/-/g, "_");
+              acc[category] = mapPortionValue(fetchedData[apiKey] || 0);
+              return acc;
+            },
+            {} as Record<string, string>
+          );
+          setSelectedPortions(initialPortions);
+        } else {
+          console.error("mealCategories tidak valid.");
+        }
+  
+      } catch (error) {
+        console.error("Error fetching Jurnal Makan data:", error);
+        setError("Terjadi kesalahan saat mengambil data jurnal makan.");
+      } finally {
         setLoading(false);
       }
     }
