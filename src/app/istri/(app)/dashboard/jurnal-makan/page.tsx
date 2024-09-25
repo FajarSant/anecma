@@ -160,7 +160,7 @@ const FoodLogForm = () => {
         // Cek jika data kosong
         if (!fetchedData || Object.keys(fetchedData).length === 0) {
           console.log("Data jurnal makanan belum ada.");
-          setError("Data jurnal makanan belum tersedia.");
+          // setError("Data jurnal makanan belum tersedia.");
           return;
         }
   
@@ -184,7 +184,7 @@ const FoodLogForm = () => {
   
       } catch (error) {
         console.error("Error fetching Jurnal Makan data:", error);
-        setError("Terjadi kesalahan saat mengambil data jurnal makan.");
+        // setError("Terjadi kesalahan saat mengambil data jurnal makan.");
       } finally {
         setLoading(false);
       }
