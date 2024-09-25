@@ -27,7 +27,16 @@ export default function HasilKalkulatorAnemiaPage() {
   const calculateScore = useCallback((formData: FormData) => {
     let score = 0;
     let explanations: string[] = [];
-
+  
+    // Kalkulator usia kehamilan
+    const usiaKehamilan = parseInt(formData.usia_kehamilan, 10);
+    let usiaKehamilanScore = 0;
+    if (usiaKehamilan > 12) {
+      usiaKehamilanScore = 1;
+    }
+    score += usiaKehamilanScore;
+    explanations.push(`Usia kehamilan: ${usiaKehamilan} minggu, skor: ${usiaKehamilanScore}.`);
+  
     // Kalkulator jumlah_anak
     const jumlahAnak = parseInt(formData.jumlah_anak, 10);
     if (jumlahAnak === 0) {
@@ -37,7 +46,7 @@ export default function HasilKalkulatorAnemiaPage() {
       score += anakScore;
       explanations.push(`Jumlah anak: ${jumlahAnak}, skor: ${anakScore}.`);
     }
-
+  
     // Kalkulator jumlah_konsumsi_ttd_terakhir
     const jumlahKonsumsiTTD = parseInt(formData.jumlah_konsumsi_ttd_terakhir, 10);
     let konsumsiScore = 0;
@@ -52,7 +61,7 @@ export default function HasilKalkulatorAnemiaPage() {
     }
     score += konsumsiScore;
     explanations.push(`Jumlah konsumsi TTD terakhir: ${jumlahKonsumsiTTD}, skor: ${konsumsiScore}.`);
-
+  
     // Kalkulator hasil_pemeriksaan_hb_terakhir
     const hbLevel = parseInt(formData.hasil_pemeriksaan_hb_terakhir, 10);
     let hbScore = 0;
@@ -63,16 +72,17 @@ export default function HasilKalkulatorAnemiaPage() {
     }
     score += hbScore;
     explanations.push(`Hasil pemeriksaan Hb terakhir: ${hbLevel}, skor: ${hbScore}.`);
-
+  
     // Kalkulator riwayat_anemia
     const riwayatAnemia = parseInt(formData.riwayat_anemia, 10);
     const riwayatScore = riwayatAnemia === 1 ? 1 : 0;
     score += riwayatScore;
     explanations.push(`Riwayat anemia: ${riwayatAnemia}, skor: ${riwayatScore}.`);
-
+  
     setTotalScore(score);
     determineRiskLevel(score, explanations);
   }, []);
+  
 
   const determineRiskLevel = (score: number, explanations: string[]) => {
     let level: string;

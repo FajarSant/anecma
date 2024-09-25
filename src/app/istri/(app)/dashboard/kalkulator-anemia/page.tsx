@@ -1,8 +1,7 @@
 "use client";
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { FaPlus } from "react-icons/fa";
-import { FaHome } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaPlus,FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
@@ -18,28 +17,39 @@ export default function KalkulatorAnemiaPage() {
     jumlah_anak: "",
     jumlah_konsumsi_ttd_terakhir: "",
     hasil_pemeriksaan_hb_terakhir: "",
-    riwayat_anemia: "0" // Default to "Tidak Punya"
+    riwayat_anemia: "0", // Default to "Tidak Punya"
   });
-
+  const [warning, setWarning] = useState("");
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { id, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [id]: value
+      [id]: value,
     }));
+    setWarning(""); // Clear warning when user types
   };
 
   const handleSubmit = () => {
+    // Check for empty fields
+    const emptyFields = Object.entries(formData).filter(([_, value]) => value.trim() === "").length;
+
+    if (emptyFields > 0) {
+      setWarning("Semua field harus diisi!"); // Set warning message
+      return; // Prevent form submission
+    }
+
     // Save form data to localStorage
-    localStorage.setItem('formData', JSON.stringify(formData));
+    localStorage.setItem("formData", JSON.stringify(formData));
     console.log("Form data saved to localStorage:", formData);
-    
+
     // Navigate to the results page
-    router.push('/istri/dashboard/kalkulator-anemia/hasil');
+    router.push("/istri/dashboard/kalkulator-anemia/hasil");
   };
-  
+
   return (
     <main>
       <div className="m-5 flex flex-row">
@@ -49,8 +59,9 @@ export default function KalkulatorAnemiaPage() {
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
 
       <div className="mx-5">
+        {warning && <div className="text-red-600 mb-4">{warning}</div>} {/* Warning message */}
         <form className="flex flex-col gap-4">
-          {Object.entries(formData).map(([id, value]) => (
+          {Object.entries(formData).map(([id, value]) =>
             id === "riwayat_anemia" ? (
               <div key={id} className="relative my-2.5">
                 <select
@@ -59,7 +70,7 @@ export default function KalkulatorAnemiaPage() {
                   onChange={handleChange}
                   className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 >
-                  {anemiaOptions.map(option => (
+                  {anemiaOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -86,11 +97,15 @@ export default function KalkulatorAnemiaPage() {
                   htmlFor={id}
                   className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                 >
-                  {id === "usia_kehamilan" ? "Usia Kehamilan(Minggu)" : id.replace(/_/g, " ").toUpperCase()}
+                  {id === "jumlah_konsumsi_ttd_terakhir"
+                    ? "Jumlah Konsumsi TTD Terakhir (7 Hari)"
+                    : id === "usia_kehamilan"
+                    ? "Usia Kehamilan (Minggu)"
+                    : id.replace(/_/g, " ").toUpperCase()}
                 </label>
               </div>
             )
-          ))}
+          )}
           <div className="flex justify-center mt-4">
             <button
               type="button"

@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaHome } from "react-icons/fa";
 import { FiBook } from "react-icons/fi";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers, LuAlarmCheck } from "react-icons/lu";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
+import { toast, Toaster } from "react-hot-toast"; // Importing Toaster and toast
 
 export default function ReminderTtdPage() {
   const { data: session, status } = useSession();
@@ -17,18 +18,46 @@ export default function ReminderTtdPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Function to fetch the current reminder settings
+  const fetchReminderSettings = async () => {
+    if (status === "authenticated" && session?.accessToken) {
+      try {
+        const response = await axiosInstance.get("/istri/dashboard/get-user-reminder-ttd", {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        });
+        const data = response.data.data; // Assuming this contains the reminder settings
+        setMorningReminderTime(data.waktu_reminder_1);
+        setEveningReminderTime(data.waktu_reminder_2);
+        setMorningReminderActive(data.is_active_reminder_1);
+        setEveningReminderActive(data.is_active_reminder_2);
+      } catch (error) {
+        setError("Gagal memuat pengaturan reminder.");
+        console.error("Error fetching reminder settings:", error);
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
       setIsSaving(true); // Start saving
       try {
+        // Validate and format time
+        const formatTime = (time: string): string => {
+          const [hours, minutes] = time.split(':');
+          return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        };
+
+        const dataToSend = {
+          waktu_reminder_1: formatTime(morningReminderTime), // Ensures HH:mm format
+          is_active_reminder_1: morningReminderActive,
+          waktu_reminder_2: formatTime(eveningReminderTime), // Ensures HH:mm format
+          is_active_reminder_2: eveningReminderActive,
+        };
+        console.log("Sending data:", dataToSend); // Console log the data
+
         const response = await axiosInstance.post(
           "/istri/dashboard/reminder-ttd",
-          {
-            waktu_reminder_1: morningReminderTime, // Ensure time is in H:i format
-            is_active_reminder_1: morningReminderActive,
-            waktu_reminder_2: eveningReminderTime, // Ensure time is in H:i format
-            is_active_reminder_2: eveningReminderActive,
-          },
+          dataToSend,
           {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
@@ -37,21 +66,41 @@ export default function ReminderTtdPage() {
         setSuccess("Data berhasil disimpan!");
         setError(null);
         console.log("Response:", response.data);
+
+        // Show success toast notification
+        toast.success("Reminder TTD berhasil di tambahkan!", {
+          position: "top-center", // Set position to top center
+        });
+
       } catch (error) {
         setError("Gagal menyimpan data.");
         setSuccess(null);
         console.error("Error saving data:", error);
+        // Show error toast notification
+        toast.error("Gagal menyimpan data.", {
+          position: "top-center", // Set position to top center
+        });
       } finally {
         setIsSaving(false); // End saving
       }
     } else {
       setError("Anda perlu login terlebih dahulu.");
       setSuccess(null);
+      // Show error toast notification for not logged in
+      toast.error("Anda perlu login terlebih dahulu.", {
+        position: "top-center", // Set position to top center
+      });
     }
   };
 
+  // Fetch reminder settings when the component mounts
+  useEffect(() => {
+    fetchReminderSettings();
+  }, [status]); // Re-fetch if authentication status changes
+
   return (
     <main>
+      <Toaster /> {/* Toast component for notifications */}
       {/* Header */}
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Reminder TTD</p>
@@ -75,9 +124,7 @@ export default function ReminderTtdPage() {
                 className="sr-only peer"
               />
               <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Pagi
-              </span>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Pagi</span>
             </label>
           </div>
           <hr className="w-full h-0.5 border-t-0 bg-gray-300" />
@@ -90,9 +137,7 @@ export default function ReminderTtdPage() {
                 className="sr-only peer"
               />
               <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Malam
-              </span>
+              <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Malam</span>
             </label>
           </div>
 
@@ -117,8 +162,6 @@ export default function ReminderTtdPage() {
             </button>
           </div>
 
-          {error && <div className="mt-2 text-red-500">{error}</div>}
-          {success && <div className="mt-2 text-green-500">{success}</div>}
         </div>
       </div>
 
@@ -128,42 +171,34 @@ export default function ReminderTtdPage() {
           <button
             type="button"
             aria-label="Home"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
-            <FaHome className="w-5 h-5 mb-2 text-blue-600 dark:text-blue-500" />
-            <span className="text-sm text-blue-600 dark:text-blue-500">
-              Home
-            </span>
+            <FaHome className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">Beranda</span>
           </button>
           <button
             type="button"
-            aria-label="Edukasi"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            aria-label="Jobs"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
-            <FiBook className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Edukasi
-            </span>
+            <FiBook className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">Pekerjaan</span>
           </button>
           <button
             type="button"
-            aria-label="Konsultasi"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            aria-label="Messages"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
-            <IoChatbubblesOutline className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Konsultasi
-            </span>
+            <IoChatbubblesOutline className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">Pesan</span>
           </button>
           <button
             type="button"
-            aria-label="Komunitas"
-            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            aria-label="Users"
+            className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
-            <LuUsers className="w-5 h-5 mb-2 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">
-              Komunitas
-            </span>
+            <LuUsers className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">Pengguna</span>
           </button>
         </div>
       </div>
