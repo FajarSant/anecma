@@ -50,7 +50,7 @@ function LoginPage() {
           localStorage.setItem('authToken', token);
           setEmail('');
           setPassword('');
-          window.location.href = '/admin/dashboard';
+          window.location.href = '/suami/dashboard';
         } else {
           setLoginError('Token tidak ditemukan.');
         }
