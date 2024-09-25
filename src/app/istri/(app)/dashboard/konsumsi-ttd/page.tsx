@@ -3,15 +3,14 @@ import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { useSession } from 'next-auth/react';
 import axiosInstance from '@/libs/axios';
-import 'react-datepicker/dist/react-datepicker.css'; // Import datepicker styles
-import { BsCalendar } from 'react-icons/bs'; // You can use any icon library or component you prefer
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function KonsumsiTtdPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [vitCChecked, setVitCChecked] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false); // New state for saving status
+  const [isSaving, setIsSaving] = useState(false); 
 
   const { data: session } = useSession(); 
   console.log("session", session);
@@ -22,14 +21,14 @@ export default function KonsumsiTtdPage() {
       return;
     }
 
-    setIsSaving(true); // Set saving status to true
+    setIsSaving(true); 
 
     try {
       const formattedDate = selectedDate ? selectedDate.toISOString().split('T')[0] : null;
 
       if (!formattedDate) {
         setErrorMessage('Tanggal tidak boleh kosong.');
-        setIsSaving(false); // Reset saving status on error
+        setIsSaving(false); 
         return;
       }
 
@@ -58,12 +57,12 @@ export default function KonsumsiTtdPage() {
       setErrorMessage(errorMessage);
       setSuccessMessage(null);
     } finally {
-      setIsSaving(false); // Reset saving status after completion
+      setIsSaving(false); 
     }
   };
 
   const handleClear = () => {
-    setSelectedDate(null); // Clear the selected date
+    setSelectedDate(null); 
   };
 
   return (
@@ -126,7 +125,7 @@ export default function KonsumsiTtdPage() {
               type="button"
               onClick={handleSave}
               className={`text-white ${isSaving ? 'bg-gray-400' : 'bg-green-pastel'} ${isSaving ? 'hover:bg-gray-400' : 'hover:bg-green-pastel/80'} focus:outline-none focus:ring-4 ${isSaving ? 'focus:ring-gray-400' : 'focus:ring-green-pastel/30'} font-medium rounded-full text-sm px-5 py-2.5 text-center me-2`}
-              disabled={isSaving} // Disable button while saving
+              disabled={isSaving} 
             >
               {isSaving ? 'Saving...' : 'Simpan'}
             </button>
