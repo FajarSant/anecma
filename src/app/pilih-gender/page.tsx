@@ -1,13 +1,15 @@
-"use client"
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { FaFemale, FaMale } from 'react-icons/fa'; // Ikon perempuan dan laki-laki
+"use client"; // Menandakan ini adalah komponen klien
+import React from 'react';
+import { FaMale, FaFemale } from 'react-icons/fa'; // Ikon untuk laki-laki dan perempuan
 
 const GenderPicker = () => {
-  const [selectedGender, setSelectedGender] = useState<string | null>(null);
-
-  const handleGenderChange = (gender: string) => {
-    setSelectedGender(gender);
+  
+  const handleGenderSelect = (gender: string) => {
+    if (gender === 'Suami') {
+      window.location.href = '/suami/login'; // Arahkan ke halaman login suami
+    } else {
+      window.location.href = '/istri/login'; // Arahkan ke halaman login istri
+    }
   };
 
   return (
@@ -16,34 +18,23 @@ const GenderPicker = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Pilih Gender</h2>
 
         <div className="flex flex-col gap-4">
-          {/* Tombol untuk memilih Istri */}
-          <Link href="/istri/login" passHref>
-            <button
-              onClick={() => handleGenderChange('Istri')}
-              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-lg text-white transition-transform transform ${
-                selectedGender === 'Istri' ? 'bg-pink-500' : 'bg-pink-400'
-              } hover:bg-pink-600 hover:scale-105 hover:shadow-lg w-full`}
-            >
-              <FaFemale size={24} /> {/* Ikon untuk Istri (Perempuan) */}
-              <span className="text-lg">Istri</span>
-            </button>
-          </Link>
+          {/* Tombol untuk memilih Perempuan */}
+          <button
+            onClick={() => handleGenderSelect('Istri')}
+            className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg bg-pink-400 text-white transition-transform transform hover:bg-pink-600 hover:scale-105 hover:shadow-lg w-full"
+          >
+            <FaFemale size={24} /> {/* Ikon untuk Perempuan */}
+            <span className="text-lg">Perempuan</span>
+          </button>
 
-          {/* Teks pemisah "atau" */}
-          <p className="text-gray-500 text-center">atau</p>
-
-          {/* Tombol untuk memilih Suami */}
-          <Link href="/suami/login" passHref>
-            <button
-              onClick={() => handleGenderChange('Suami')}
-              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-lg text-white transition-transform transform ${
-                selectedGender === 'Suami' ? 'bg-blue-500' : 'bg-blue-400'
-              } hover:bg-blue-600 hover:scale-105 hover:shadow-lg w-full`}
-            >
-              <FaMale size={24} /> {/* Ikon untuk Suami (Laki-laki) */}
-              <span className="text-lg">Suami</span>
-            </button>
-          </Link>
+          {/* Tombol untuk memilih Laki-laki */}
+          <button
+            onClick={() => handleGenderSelect('Suami')}
+            className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg bg-blue-400 text-white transition-transform transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg w-full"
+          >
+            <FaMale size={24} /> {/* Ikon untuk Laki-laki */}
+            <span className="text-lg">Laki-laki</span>
+          </button>
         </div>
       </div>
     </div>
