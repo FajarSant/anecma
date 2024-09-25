@@ -24,7 +24,7 @@ const GenderPicker = () => {
             className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg bg-pink-400 text-white transition-transform transform hover:bg-pink-600 hover:scale-105 hover:shadow-lg w-full"
           >
             <FaFemale size={24} /> {/* Ikon untuk Perempuan */}
-            <span className="text-lg">Perempuan</span>
+            <span className="text-lg">Istri</span>
           </button>
 
           {/* Tombol untuk memilih Laki-laki */}
@@ -33,7 +33,7 @@ const GenderPicker = () => {
             className="flex items-center justify-center gap-3 px-8 py-4 rounded-lg bg-blue-400 text-white transition-transform transform hover:bg-blue-600 hover:scale-105 hover:shadow-lg w-full"
           >
             <FaMale size={24} /> {/* Ikon untuk Laki-laki */}
-            <span className="text-lg">Laki-laki</span>
+            <span className="text-lg">Suami</span>
           </button>
         </div>
       </div>
