@@ -134,7 +134,7 @@ const FoodLogForm = () => {
   >({});
   const { data: session, status } = useSession();
 
-  useEffect(() => {
+ useEffect(() => {
     async function fetchJurnalMakanData() {
       // Pastikan user sudah terotentikasi dan accessToken tersedia
       if (status !== "authenticated" || !session?.accessToken) {
@@ -183,8 +183,8 @@ const FoodLogForm = () => {
           console.error("mealCategories tidak valid.");
         }
         
-        // Call revalidatePath 
-        revalidatePath("/istri/dashboard/get-jurnal-makan/");
+        // Call revalidatePath after successfully fetching data
+        await axiosInstance.get('/api/revalidate');
         
       } 
       catch (error) {
