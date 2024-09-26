@@ -3,7 +3,6 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
-import { revalidatePath } from "next/cache";
 
 // Opsi waktu makan
 const mealOptions = [
@@ -134,7 +133,7 @@ const FoodLogForm = () => {
   >({});
   const { data: session, status } = useSession();
 
- useEffect(() => {
+  useEffect(() => {
     async function fetchJurnalMakanData() {
       // Pastikan user sudah terotentikasi dan accessToken tersedia
       if (status !== "authenticated" || !session?.accessToken) {
@@ -167,7 +166,7 @@ const FoodLogForm = () => {
   
         // Set data ke state
         setJurnalMakanData(fetchedData);
-        
+  
         // Set initial selected portions based on fetched data
         if (mealCategories && typeof mealCategories === 'object') {
           const initialPortions = Object.keys(mealCategories).reduce(
@@ -182,22 +181,18 @@ const FoodLogForm = () => {
         } else {
           console.error("mealCategories tidak valid.");
         }
-        
-        // Call revalidatePath after successfully fetching data
-        await axiosInstance.get('/api/revalidate');
-        
-      } 
-      catch (error) {
+  
+      } catch (error) {
         console.error("Error fetching Jurnal Makan data:", error);
         // setError("Terjadi kesalahan saat mengambil data jurnal makan.");
       } finally {
         setLoading(false);
       }
     }
-    
+  
     fetchJurnalMakanData();
   }, [session, status, selectedTab]);
-
+  
   const getCheckedValue = (category: string) => {
     return selectedPortions[category] || "";
   };

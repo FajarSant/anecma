@@ -26,8 +26,8 @@ export default function ReminderTtdPage() {
           headers: { Authorization: `Bearer ${session.accessToken}` },
         });
         const data = response.data.data; // Assuming this contains the reminder settings
-        setMorningReminderTime(data.waktu_reminder_1);
-        setEveningReminderTime(data.waktu_reminder_2);
+        setMorningReminderActive(parseInt(data.is_active_reminder_1) === 1);
+        setEveningReminderActive(parseInt(data.is_active_reminder_2) === 1);
         setMorningReminderActive(data.is_active_reminder_1);
         setEveningReminderActive(data.is_active_reminder_2);
       } catch (error) {
