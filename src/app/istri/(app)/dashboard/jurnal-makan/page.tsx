@@ -183,7 +183,7 @@ const FoodLogForm = () => {
           console.error("mealCategories tidak valid.");
         }
         
-        // Call revalidatePath after successfully fetching data
+        // Call revalidatePath 
         revalidatePath("/istri/dashboard/get-jurnal-makan/");
         
       } 
