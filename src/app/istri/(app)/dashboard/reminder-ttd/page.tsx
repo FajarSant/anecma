@@ -29,7 +29,7 @@ export default function ReminderTtdPage() {
         setMorningReminderTime(data.waktu_reminder_1);
         setEveningReminderTime(data.waktu_reminder_2);
         setMorningReminderActive(parseInt(data.is_active_reminder_1) === 1);
-        setEveningReminderActive(parseInt(data.is_active_reminder_2) === 1);
+        setEveningReminderActive(parseInt(data.is_active_reminder_2) === 1)
       } catch (error) {
         setError("Gagal memuat pengaturan reminder.");
         console.error("Error fetching reminder settings:", error);
