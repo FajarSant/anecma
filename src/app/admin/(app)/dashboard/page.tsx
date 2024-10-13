@@ -1,149 +1,126 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
-import axiosInstance from "@/libs/axios";
+import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
-import Layout from "../layout";
+import axiosInstance from "@/libs/axios";
 
-interface DashboardData {
-  ibu_hamil: number;
-  ibu_hamil_anemia_rendah: number;
-  ibu_hamil_anemia_tinggi: number;
-  rata_rata_konsumsi_ttd: number | null;
-}
-
-interface ResikoAnemia {
-  id: number;
-  user_id: number;
-  usia_kehamilan: number;
-  jumlah_anak: number;
-  riwayat_anemia: number;
-  konsumsi_ttd_7hari: number;
-  hasil_hb: number;
-  resiko: string;
-  created_at: string | null;
-  updated_at: string | null;
-}
-
-interface DataItem {
-  id: number;
-  name: string;
-  usia: number | null;
-  resiko_anemia: ResikoAnemia[];
-}
+const Skeleton = () => (
+  <div className="p-4 bg-white rounded shadow text-center animate-pulse">
+    <div className="h-10 bg-gray-200 rounded mb-4"></div>
+    <div className="h-8 bg-gray-200 rounded"></div>
+  </div>
+);
 
 const HomePage: React.FC = () => {
-  const [dashboardData, setDashboardData] = useState<DashboardData>({
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [dashboardData, setDashboardData] = useState<any>({
     ibu_hamil: 0,
     ibu_hamil_anemia_rendah: 0,
     ibu_hamil_anemia_tinggi: 0,
-    rata_rata_konsumsi_ttd: 0,
+    rata_rata_konsumsi_ttd: "0.000",
   });
-  const [dataItems, setDataItems] = useState<DataItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem("authToken");
+      setLoading(true); // Start loading
       try {
-        const authToken = localStorage.getItem("authToken");
-
-        if (!authToken) {
-          throw new Error("Authentication token not found.");
-        }
-
-        axiosInstance.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${authToken}`;
-
-        // Ambil data dashboard
         const response = await axiosInstance.get(
-          "/admin/dashboard-card-hitung-data"
+          "/admin/dashboard-card-hitung-data",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
-        const data = response.data.data;
 
-        setDashboardData({
-          ibu_hamil: data.ibu_hamil || 0,
-          ibu_hamil_anemia_rendah: data.ibu_hamil_anemia_rendah || 0,
-          ibu_hamil_anemia_tinggi: data.ibu_hamil_anemia_tinggi || 0,
-          rata_rata_konsumsi_ttd:
-            typeof data.rata_rata_konsumsi_ttd === "number"
-              ? data.rata_rata_konsumsi_ttd
-              : 0,
-        });
-
-        // Ambil data tabel
-        const responseItems = await axiosInstance.get(
-          "/admin/dashboard-data-terbaru"
-        );
-        setDataItems(responseItems.data.data);
+        if (response.data.success) {
+          setDashboardData(response.data.data);
+        }
       } catch (error) {
-        console.error("Terjadi kesalahan saat mengambil data:", error);
-        setError("Gagal mengambil data. Silakan coba lagi nanti.");
+        console.error("Failed to fetch dashboard data", error);
+      } finally {
+        setLoading(false); // End loading
+      }
+    };
+
+    const fetchTableData = async () => {
+      const token = localStorage.getItem("authToken");
+      try {
+        const response = await axiosInstance.get(
+          "/admin/dashboard-data-terbaru",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setTableData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch table data", error);
       }
     };
 
     fetchData();
+    fetchTableData();
   }, []);
 
-  const filteredDataItems = dataItems
-    .filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .flatMap((item) =>
-      item.resiko_anemia.map((resiko) => ({
-        ...resiko,
-        itemName: item.name,
-        usia: item.usia,
-      }))
-    );
+  const filteredData = tableData.filter((user) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen flex flex-col">
       {/* Dashboard Card */}
-      <div className="bg-gray-100 p-6 rounded-lg  mb-6">
+      <div className="bg-gray-100 p-6 rounded-lg mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className=" p-4 bg-white rounded shadow text-center">
-            <div>
-              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
-                Jumlah Ibu Hamil
-              </h2>
-              <p className="text-4xl">{dashboardData.ibu_hamil}</p>
-            </div>
-          </div>
-          <div className=" p-4 bg-white rounded shadow text-center">
-            <div>
-              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
-                Anemia Rendah
-              </h2>
-              <p className="text-4xl">
-                {dashboardData.ibu_hamil_anemia_rendah}
-              </p>
-            </div>
-          </div>
-          <div className=" p-4 bg-white rounded shadow text-center">
-            <div>
-              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
-                Anemia Tinggi
-              </h2>
-              <p className="text-4xl">
-                {dashboardData.ibu_hamil_anemia_tinggi}
-              </p>
-            </div>
-          </div>
-          <div className=" p-4 bg-white rounded shadow text-center">
-            <div>
-              <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
-                Rata-rata TTD
-              </h2>
-              <p className="text-4xl">
-                {typeof dashboardData.rata_rata_konsumsi_ttd === "number" &&
-                !isNaN(dashboardData.rata_rata_konsumsi_ttd)
-                  ? dashboardData.rata_rata_konsumsi_ttd.toFixed(2)
-                  : "0.00"}
-              </p>
-            </div>
-          </div>
+          {loading ? (
+            <>
+              <Skeleton />
+              <Skeleton />
+              <Skeleton />
+              <Skeleton />
+            </>
+          ) : (
+            <>
+              <div className="p-4 bg-white rounded shadow text-center">
+                <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                  Jumlah Ibu Hamil
+                </h2>
+                <p className="text-4xl">{dashboardData.ibu_hamil}</p>
+              </div>
+              <div className="p-4 bg-white rounded shadow text-center">
+                <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                  Anemia Rendah
+                </h2>
+                <p className="text-4xl">
+                  {dashboardData.ibu_hamil_anemia_rendah}
+                </p>
+              </div>
+              <div className="p-4 bg-white rounded shadow text-center">
+                <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                  Anemia Tinggi
+                </h2>
+                <p className="text-4xl">
+                  {dashboardData.ibu_hamil_anemia_tinggi}
+                </p>
+              </div>
+              <div className="p-4 bg-white rounded shadow text-center">
+                <h2 className="text-lg font-semibold border-b border-gray-200 mb-4">
+                  Rata-rata TTD
+                </h2>
+                <p className="text-4xl">
+                  {parseFloat(dashboardData.rata_rata_konsumsi_ttd).toFixed(3)}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -174,40 +151,45 @@ const HomePage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredDataItems.length > 0 ? (
-                filteredDataItems.map((resiko, index) => (
-                  <tr key={resiko.id} className="hover:bg-gray-100">
-                    <td className="px-4 py-2 text-center border-b border-r">
-                      {index + 1}
-                    </td>
-                    <td className="px-4 py-2 text-center border-b border-r">
-                      {resiko.itemName}
-                    </td>
-                    <td className="px-4 py-2 text-center border-b border-r">
-                      {resiko.usia ?? "Data tidak tersedia"}
-                    </td>
-                    <td className="px-4 py-2 text-center border-b border-r">
-                      {resiko.resiko}
-                    </td>
-                    <td className="px-4 py-2 text-center border-b border-r">
-                      {resiko.konsumsi_ttd_7hari ?? "Data tidak tersedia"}
-                    </td>
-                    <td className="px-4 py-2 text-center border-b border-r">
-                      {resiko.hasil_hb ?? "Data tidak tersedia"}
-                    </td>
-                  </tr>
-                ))
-              ) : (
+              {loading ? (
                 <tr>
-                  <td className="px-4 py-2 text-center border-b" colSpan={6}>
-                    Tidak ada data yang tersedia
+                  <td colSpan={6} className="text-center py-4">
+                    <Skeleton />
                   </td>
                 </tr>
+              ) : (
+                filteredData.map((user, index) => {
+                  const resikoAnemia =
+                    user.resiko_anemia.length > 0
+                      ? user.resiko_anemia[0]
+                      : null;
+                  return (
+                    <tr key={user.id}>
+                      <td className="px-4 py-2 text-center border-b border-r">
+                        {index + 1}
+                      </td>
+                      <td className="px-4 py-2 text-center border-b border-r">
+                        {user.name}
+                      </td>
+                      <td className="px-4 py-2 text-center border-b border-r">
+                        {user.usia}
+                      </td>
+                      <td className="px-4 py-2 text-center border-b border-r">
+                        {resikoAnemia ? resikoAnemia.resiko : "Tidak ada"}
+                      </td>
+                      <td className="px-4 py-2 text-center border-b border-r">
+                        {resikoAnemia ? resikoAnemia.konsumsi_ttd_7hari : "0"}
+                      </td>
+                      <td className="px-4 py-2 text-center border-b border-r">
+                        {resikoAnemia ? resikoAnemia.hasil_hb : "0"}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
-        {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
       </div>
     </div>
   );

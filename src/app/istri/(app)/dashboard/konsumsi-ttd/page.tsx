@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import { useSession } from 'next-auth/react';
 import axiosInstance from '@/libs/axios';
 import 'react-datepicker/dist/react-datepicker.css';
+import { toast, Toaster } from 'sonner'; // Import toast from Sonner
 
 export default function KonsumsiTtdPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -13,7 +14,6 @@ export default function KonsumsiTtdPage() {
   const [isSaving, setIsSaving] = useState(false); 
 
   const { data: session } = useSession(); 
-  console.log("session", session);
 
   const handleSave = async () => {
     if (!session || !session.accessToken) {
@@ -45,6 +45,13 @@ export default function KonsumsiTtdPage() {
 
       setSuccessMessage('Data berhasil disimpan!');
       setErrorMessage(null);
+      
+      // Display toast notification
+      toast.success('TTD Berhasil Ditambahkan!',{
+        position: "top-center",
+      }
+      ); // Show success toast
+
     } catch (error: any) {
       const errorCode = error.response?.status || 'No code';
       const errorMessage = error.response?.data?.message || 'Gagal menyimpan data.';
@@ -67,6 +74,7 @@ export default function KonsumsiTtdPage() {
 
   return (
     <main>
+        <Toaster richColors position="top-center" />
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Konsumsi TTD</p>
       </div>
@@ -130,8 +138,6 @@ export default function KonsumsiTtdPage() {
               {isSaving ? 'Saving...' : 'Simpan'}
             </button>
           </div>
-          {successMessage && <p className="text-green-600">{successMessage}</p>}
-          {errorMessage && <p className="text-red-600">{errorMessage}</p>}
         </div>
       </div>
 

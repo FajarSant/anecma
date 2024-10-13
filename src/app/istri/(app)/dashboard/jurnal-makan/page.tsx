@@ -3,14 +3,14 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
-
+ 
 // Opsi waktu makan
 const mealOptions = [
   { name: "sarapan", label: "Sarapan", jam_makan: "sarapan" },
   { name: "makan_siang", label: "Makan Siang", jam_makan: "makan_siang" },
   { name: "makan_malam", label: "Makan Malam", jam_makan: "makan_malam" },
 ];
-
+ 
 // Opsi porsi
 const portionSizes = {
   default: [
@@ -54,62 +54,51 @@ const portionSizes = {
     { value: "2", label: "2 Porsi" },
   ],
 };
-
+ 
 // Gambar kategori makanan
 const mealCategories = {
   karbohidrat: [
-    { src: "/images/nasi-1-piring.jpg", alt: "Nasi 1 Piring", title: "Nasi", description: "1 Piring Kecil" },
-    { src: "/images/kentang-2-buah.jpg", alt: "Kentang 2 Buah", title: "Kentang", description: "2 Buah Ukuran Sedang" },
-    { src: "/images/mie-2-buah.jpg", alt: "Mie 2 Buah", title: "Mie", description: "2 Buah Ukuran Sedang" },
-    { src: "/images/ubi-1-biji-sedang.jpg", alt: "Ubi 1 Biji Sedang", title: "Ubi", description: "1 Biji Sedang" },
-    { src: "/images/roti-3-lembar.jpg", alt: "Roti 3 Lembar", title: "Roti", description: "3 Lembar" },
-    { src: "/images/singkong-1-setengah-buah.jpg", alt: "Singkong 1 Setengah Buah", title: "Singkong", description: "1.5 Buah" },
+    {
+      src: "/images/nasi-1-piring.jpg",
+      alt: "Nasi 1 Piring",
+      title: "Nasi",
+      description: "1 Piring Kecil",
+    },
   ],
   lauk_hewani: [
-    { src: "/images/ikan-lele.jpg", alt: "Ikan-Lele", title: "Ikan Lele", description: "1/3 sedang ikan Lele " },
-    { src: "/images/ikan-mujair.jpg", alt: "Ikan-Mujair", title: "Ikan Mujair", description: "1/3 ekor sedang ikan Mujair" },
-    { src: "/images/ikan-bandeng.jpg", alt: "Ikan-Bandeng", title: "Ikan Bandeng", description: "1 potong badan Ikan Bandeng" },
-    { src: "/images/ikan-gurame.jpg", alt: "Ikan-gurame", title: "Ikan gurame", description: "1 potong badan Ikan gurame" },
-    { src: "/images/ikan-tengiri.jpg", alt: "Ikan-tengiri", title: "Ikan tengiri", description: "1 potong badan Ikan tengiri" },
-    { src: "/images/ikan-patin.jpg", alt: "Ikan-patin", title: "Ikan patin", description: "1 potong badan Ikan patin" },
-    { src: "/images/ikan-teri-padang.jpg", alt: "ikan-teri-padang", title: "Ikan Teri Padang", description: "3 sendok makan teri padang" },
-    { src: "/images/ikan-teri-nasi.jpg", alt: "ikan-teri-nasi", title: "Ikan Teri Nasi", description: "1/3 gelas teri nasi" },
-    { src: "/images/telur.jpg", alt: "telur", title: "Telur", description: "1 Butir Telur" },
-    { src: "/images/telur-puyuh.jpg", alt: "telur-puyuh", title: "Telur Puyuh", description: "5 Butir elur puyuh" },
-    { src: "/images/sayap-ayam.jpg", alt: "sayap-ayam", title: "Daging Ayam ", description: "1 Potong sedang" },
-    { src: "/images/paha-ayam.jpg", alt: "paha-ayam", title: "Daging Ayam", description: "1 Potong sedang" },
-    { src: "/images/dada-ayam.jpg", alt: "dada-ayam", title: "Daging Ayam", description: "1 Potong sedang" },
-    { src: "/images/leher-ayam.jpg", alt: "leher-ayam", title: "Daging Ayam", description: "1 Potong sedang" },
-    { src: "/images/daging-potong-sedang.jpg", alt: "daging", title: "Daging ", description: "1 Potong Daging Sedang" },
-    { src: "/images/jeroan-ati.jpg", alt: "Jeroan", title: "Jeroan Ati", description: "1 Buah Sedanh Ati" },
-    { src: "/images/jeroan-rempelo.jpg", alt: "Jeroan", title: "Jeroan Rempela", description: "Jeroan Rempela" },
-    { src: "/images/seafood-udang.jpg", alt: "Seafood", title: "Seafood Udang", description: "5 Ekor Sedang Udang" },
-    { src: "/images/seafood-cumi.jpg", alt: "Seafood", title: "Seafood Cumo", description: "2 Ekor Cumi" },
-    { src: "/images/nugget.jpg", alt: "Nugget", title: "Nugget", description: "Nugget 2 Potong" },
+    {
+      src: "/images/ikan-lele.jpg",
+      alt: "Ikan-Lele",
+      title: "Ikan Lele",
+      description: "1/3 sedang ikan Lele ",
+    },
   ],
   lauk_nabati: [
-    { src: "/images/tahu.jpg", alt: "Tahu", title: "Tahu", description: "2 Potong Sedang" },
-    { src: "/images/tempe.jpg", alt: "Tempe", title: "Tempe", description: "2 Tempe Sedang" },
-    { src: "/images/tempe-orek.jpg", alt: "Tempe Orek", title: "Tempe Orek", description: "3 Sendok Makan Tempe Orek" },
-    { src: "/images/kacang-ijo.jpg", alt: "Kacang Ijo", title: "Kacang Ijo", description: ": 2 ½ Sendok Makan, Kacang Ijo" },
-    { src: "/images/kacang-merah.jpg", alt: "Kacang Merah", title: "Kacang Merah", description: "2 ½ Sendok Makan, Kacang Merah" },
-    { src: "/images/kacang-tanah.jpg", alt: "Kacang Tanah", title: "Kacang Tanah", description: "2 Sendok Makan Kacang Tanah Rebus " },
+    {
+      src: "/images/tahu.jpg",
+      alt: "Tahu",
+      title: "Tahu",
+      description: "2 Potong Sedang",
+    },
   ],
   sayur: [
-    { src: "/images/5-sendok-makan.jpg", alt: "Sayur", title: "Sayur", description: "5 Sendok Makan" },
-    { src: "/images/1-mangkuk-kecil.jpg", alt: "Sayur", title: "Sayur", description: "1 Mangkuk Kecil" },
-    { src: "/images/2-sendok-sayur.jpg", alt: "Sayur", title: "Sayur", description: "2 Sendok Sayur" },
+    {
+      src: "/images/5-sendok-makan.jpg",
+      alt: "Sayur",
+      title: "Sayur",
+      description: "5 Sendok Makan",
+    },
   ],
   buah: [
-    { src: "/images/semangka.jpg", alt: "Semangka", title: "Semangka", description: "2 Potong Sedang Semangka" },
-    { src: "/images/pepaya.jpg", alt: "Pepaya", title: "Pepaya", description: "1 Potong Besar Pepaya" },
-    { src: "/images/pisang.jpg", alt: "Pisang", title: "Pisang", description: "1 Buah Sedang Pisang" },
-    { src: "/images/melon.jpg", alt: "Melon", title: "Melon", description: "1 Potong Buah Melon" },
-    { src: "/images/mangga.jpg", alt: "Mangga", title: "Mangga", description: "¾ Buah Besar Mangga" },
-    { src: "/images/apel.jpg", alt: "Apel", title: "Apel", description: "1 Buah Kecil Apel" },
+    {
+      src: "/images/semangka.jpg",
+      alt: "Semangka",
+      title: "Semangka",
+      description: "2 Potong Sedang Semangka",
+    },
   ],
 };
-
+ 
 // Konversi data porsi API ke dalam format yang sesuai dengan opsi porsi
 const mapPortionValue = (value: number) => {
   if (value === 0.5) return "0.5";
@@ -122,7 +111,7 @@ const mapPortionValue = (value: number) => {
   if (value === 4) return "4";
   return "";
 };
-
+ 
 const FoodLogForm = () => {
   const [selectedTab, setSelectedTab] = useState<string>("sarapan");
   const [jurnalMakanData, setJurnalMakanData] = useState<any>({});
@@ -132,7 +121,7 @@ const FoodLogForm = () => {
     Record<string, string>
   >({});
   const { data: session, status } = useSession();
-
+ 
   useEffect(() => {
     async function fetchJurnalMakanData() {
       // Pastikan user sudah terotentikasi dan accessToken tersedia
@@ -143,45 +132,46 @@ const FoodLogForm = () => {
         setLoading(false);
         return; // Hentikan eksekusi jika user tidak terotentikasi
       }
-  
+ 
       try {
         setLoading(true); // Set loading state saat mulai fetch data
-  
+ 
         const response = await axiosInstance.get(
           "/istri/dashboard/get-jurnal-makan",
           {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
         );
-        
+ 
         const fetchedData = response.data.data; // Mengambil data yang diperlukan
-        console.log("Data jurnal makanan:", fetchedData);
-  
+ 
         // Cek jika data kosong
         if (!fetchedData || Object.keys(fetchedData).length === 0) {
-          console.log("Data jurnal makanan belum ada.");
-          // setError("Data jurnal makanan belum tersedia.");
           return;
         }
-  
+ 
         // Set data ke state
         setJurnalMakanData(fetchedData);
-  
+ 
         // Set initial selected portions based on fetched data
-        if (mealCategories && typeof mealCategories === 'object') {
+        if (mealCategories && typeof mealCategories === "object") {
           const initialPortions = Object.keys(mealCategories).reduce(
             (acc, category) => {
               const apiKey = `${selectedTab}_${category}`.replace(/-/g, "_");
-              acc[category] = mapPortionValue(fetchedData[apiKey] || 0);
+ 
+              acc[category] = mapPortionValue(
+                parseFloat(fetchedData[apiKey]) || 0
+              );
               return acc;
             },
             {} as Record<string, string>
           );
+ 
+ 
           setSelectedPortions(initialPortions);
         } else {
           console.error("mealCategories tidak valid.");
         }
-  
       } catch (error) {
         console.error("Error fetching Jurnal Makan data:", error);
         // setError("Terjadi kesalahan saat mengambil data jurnal makan.");
@@ -189,87 +179,63 @@ const FoodLogForm = () => {
         setLoading(false);
       }
     }
-  
+ 
     fetchJurnalMakanData();
   }, [session, status, selectedTab]);
-  
+ 
+ 
   const getCheckedValue = (category: string) => {
+ 
     return selectedPortions[category] || "";
   };
-
+ 
   const handleRadioChange = (category: string, value: string) => {
     setSelectedPortions((prev) => ({
       ...prev,
-      [category]: value,
+      [category]: value, 
     }));
   };
-
+ 
   const handleSave = async () => {
     if (status === "authenticated" && session?.accessToken) {
       try {
-        const currentMealOption = mealOptions.find(option => option.name === selectedTab);
-        const jamMakan = currentMealOption?.jam_makan;
-  
-        // Format data yang akan dikirim berdasarkan porsi yang dipilih oleh user
-        const formattedData = Object.keys(selectedPortions).reduce((acc, category) => {
-          acc[`${jamMakan}_${category}`] = selectedPortions[category] || ""; // Tetap string
-          return acc;
-        }, {} as Record<string, string>);
-  
-        // Tambahkan jam_makan ke dalam data yang akan dikirim
-        formattedData.jam_makan = jamMakan || "";
-  
-        // Hitung kalori dari porsi saat ini (data yang baru ditambahkan)
-        const currentMealCalories = Object.values(selectedPortions)
-          .reduce((sum, value) => sum + parseFloat(value || "0"), 0);
-  
-        // Ambil total kalori sebelumnya
-        let totalKalori = 0;
-        if (jurnalMakanData?.total_kalori) {
-          totalKalori = parseFloat(jurnalMakanData.total_kalori || "0");
-        }
-  
-        // Ambil data porsi sebelumnya untuk waktu makan ini (jika ada)
-        const previousPortions = jurnalMakanData
-          ? Object.keys(selectedPortions).reduce((acc, category) => {
-              const key = `${jamMakan}_${category}`;
-              acc[category] = parseFloat(jurnalMakanData[key] || "0");
-              return acc;
-            }, {} as Record<string, number>)
-          : {};
-  
-        const previousMealCalories = Object.values(previousPortions).reduce((sum, value) => sum + value, 0);
-  
-        // Hitung selisih antara kalori baru dan kalori lama
-        const calorieDifference = currentMealCalories - previousMealCalories;
-  
-        // // Tampilkan data sebelumnya dan sesudahnya di console
-        // console.log("Data sebelumnya:", previousPortions);
-        // console.log(`Jumlah kalori sebelumnya: ${previousMealCalories}`);
-        // console.log("Data sesudah diedit:", selectedPortions);
-        // console.log(`Jumlah kalori sesudah diedit: ${currentMealCalories}`);
-        // console.log(`Perubahan kalori: ${calorieDifference > 0 ? '+' : ''}${calorieDifference}`);
-  
-        // Tambahkan atau kurangi total kalori dengan selisih yang dihasilkan
-        totalKalori += calorieDifference;
-  
-        // Simpan total kalori baru untuk waktu makan saat ini
-        formattedData[`${jamMakan}_total_kalori`] = currentMealCalories.toString();
-  
-        // Simpan total semua kalori (termasuk dari waktu makan sebelumnya)
-        formattedData.total_kalori = totalKalori.toString();
-  
-        // Tampilkan hasil akhir yang akan dikirim
-        console.log("Data yang akan dikirim ke API:", formattedData);
-  
-        // Kirim data ke API
-        await axiosInstance.post(
-          "/istri/dashboard/jurnal-makan",
-          formattedData,
-          {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          }
+        const currentMealOption = mealOptions.find(
+          (option) => option.name === selectedTab
         );
+        const jamMakan = currentMealOption?.jam_makan;
+ 
+        // Format data yang akan dikirim berdasarkan porsi yang dipilih oleh user
+        const formattedData = Object.keys(selectedPortions).reduce(
+          (acc, category) => {
+            acc[`${jamMakan}_${category}`] = selectedPortions[category] || ""; 
+            return acc;
+          },
+          {} as Record<string, string>
+        ); // Ensure this is a Record<string, number>
+ 
+        // Tambahkan jam_makan ke dalam data yang akan dikirim
+        formattedData.jam_makan = jamMakan || ""; // If jam_makan should be a string
+ 
+        // Tentukan endpoint berdasarkan tab yang aktif
+        let endpoint = "";
+        switch (selectedTab) {
+          case "makan_malam":
+            endpoint = "/istri/dashboard/insert-makan-malam";
+            break;
+          case "makan_siang":
+            endpoint = "/istri/dashboard/insert-makan-siang";
+            break;
+          case "sarapan":
+            endpoint = "/istri/dashboard/insert-sarapan";
+            break;
+          default:
+            throw new Error("Tab tidak dikenali");
+        }
+ 
+        // Kirim data ke API
+        await axiosInstance.post(endpoint, formattedData, {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        });
       } catch (error) {
         console.error("Error saving data:", error);
       }
@@ -277,20 +243,19 @@ const FoodLogForm = () => {
       alert("Anda harus masuk untuk menyimpan data.");
     }
   };
-  
-  
+ 
   const categories = Object.keys(mealCategories) as Array<
     keyof typeof mealCategories
   >;
-
+ 
   if (error) return <div>{error}</div>;
-
+ 
   return (
     <div className="">
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Jurnal Makan</p>
       </div>
-
+ 
       <hr className="mx-5 mb-5 h-0.5 border-t-0 bg-gray-300" />
       <div className="tabs flex mx-5 justify-between">
         {mealOptions.map((tab) => (
@@ -380,5 +345,5 @@ const FoodLogForm = () => {
     </div>
   );
 };
-
+ 
 export default FoodLogForm;

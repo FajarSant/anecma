@@ -18,7 +18,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <Sidebar currentPath={pathname} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col ml-64  overflow-hidden">
+      <div className="flex-1 flex flex-col ml-64 ">
       <div className='p-4 bg-gray-100'>
         <TopBar title={getTitle(pathname)} userName={userName} userImage={userImage} />
       </div>
@@ -39,6 +39,8 @@ const getTitle = (pathname: string) => {
       return 'Data Puskesmas';
     case '/admin/petugas':
       return 'Data Petugas';
+    case '/admin/edukasi':
+      return 'Data Edukasi';
     case '/admin/settings':
       return 'Settings';
     default:

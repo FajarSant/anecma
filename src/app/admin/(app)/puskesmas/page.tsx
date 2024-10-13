@@ -4,17 +4,15 @@ import { FaRegUser, FaPlus } from "react-icons/fa";
 import { CiTrash } from "react-icons/ci";
 import { BiSolidEdit } from "react-icons/bi";
 import axiosInstance from "@/libs/axios";
-import AddPuskesmasModal from './AddPuskesmasModal';
-import DeleteConfirmationModal from './DeletePuskesmasModal';
-import EditPuskesmasModal from './EditPuskesmasModal';
-import ShowPuskesmasModal from './ShowPuskesmasModal'; // Modal untuk menampilkan detail Puskesmas
-import Swal from 'sweetalert2';
+import AddPuskesmasModal from "@/components/modal/puskesmas/AddPuskesmasModal";
+import EditPuskesmasModal from "@/components/modal/puskesmas/EditPuskesmasModal";
+import ShowPuskesmasModal from "@/components/modal/puskesmas/ShowPuskesmasModal";
+import Swal from "sweetalert2";
 
 interface PuskesmasItem {
   id: number;
   nama_puskesmas: string;
   alamat: string;
-  email: string;
   status: string;
 }
 
@@ -22,16 +20,15 @@ const Puskesmas: React.FC = () => {
   const [puskesmasData, setPuskesmasData] = useState<PuskesmasItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedPuskesmasName, setSelectedPuskesmasName] = useState<string>('');
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editPuskesmasData, setEditPuskesmasData] = useState<PuskesmasItem | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isShowModalOpen, setIsShowModalOpen] = useState(false);
   const [showPuskesmasData, setShowPuskesmasData] = useState<PuskesmasItem | null>(null);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchPuskesmasData = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("authToken");
         if (!token) {
@@ -52,6 +49,8 @@ const Puskesmas: React.FC = () => {
       } catch (error) {
         console.error("Error fetching puskesmas data:", error);
         setError("Gagal memuat data Puskesmas. Silakan coba lagi nanti.");
+      } finally {
+        setLoading(false); // Set loading false setelah fetching data
       }
     };
 
@@ -64,21 +63,21 @@ const Puskesmas: React.FC = () => {
       if (!token) {
         throw new Error("No token found");
       }
-  
+
       const response = await axiosInstance.post("/admin/data-puskesmas/insert", data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.data && response.data.success) {
         setPuskesmasData((prev) => [...prev, response.data.data]);
-        setIsAddModalOpen(false); 
-  
+        setIsAddModalOpen(false);
+
         Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: 'Puskesmas berhasil ditambahkan!',
+          icon: "success",
+          title: "Berhasil",
+          text: "Puskesmas berhasil ditambahkan!",
         });
       }
     } catch (error) {
@@ -88,41 +87,47 @@ const Puskesmas: React.FC = () => {
   };
 
   const handleDelete = (id: number, nama: string) => {
-    setDeletingId(id);
-    setSelectedPuskesmasName(nama);
-    setIsDeleteModalOpen(true);
+    Swal.fire({
+      title: `Apakah Anda yakin ingin menghapus ${nama}?`,
+      text: "Data ini tidak dapat dikembalikan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Hapus",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await confirmDelete(id);
+      }
+    });
   };
 
-  const confirmDelete = async () => {
-    if (deletingId) {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          throw new Error("No token found");
-        }
-  
-        const response = await axiosInstance.post(`/admin/data-puskesmas/delete/${deletingId}`, {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        if (response.data && response.data.success) {
-          setPuskesmasData((prev) => prev.filter(item => item.id !== deletingId));
-          setDeletingId(null); 
-  
-          Swal.fire({
-            icon: 'success',
-            title: 'Berhasil',
-            text: 'Puskesmas berhasil dihapus!',
-          });
-        }
-      } catch (error) {
-        console.error("Error deleting puskesmas:", error);
-        setError("Gagal menghapus Puskesmas. Silakan coba lagi.");
-      } finally {
-        setIsDeleteModalOpen(false);
+  const confirmDelete = async (id: number) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error("No token found");
       }
+
+      const response = await axiosInstance.post(`/admin/data-puskesmas/delete/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data && response.data.success) {
+        setPuskesmasData((prev) => prev.filter((item) => item.id !== id));
+
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Puskesmas berhasil dihapus!",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting puskesmas:", error);
+      setError("Gagal menghapus Puskesmas. Silakan coba lagi.");
     }
   };
 
@@ -132,23 +137,23 @@ const Puskesmas: React.FC = () => {
       if (!token) {
         throw new Error("No token found");
       }
-  
+
       const response = await axiosInstance.post(`/admin/data-puskesmas/update/${data.id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.data && response.data.success) {
         setPuskesmasData((prev) =>
           prev.map((item) => (item.id === data.id ? { ...item, ...data } : item))
         );
-        setIsEditModalOpen(false); 
-  
+        setIsEditModalOpen(false);
+
         Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: 'Puskesmas berhasil diedit!',
+          icon: "success",
+          title: "Berhasil",
+          text: "Puskesmas berhasil diedit!",
         });
       }
     } catch (error) {
@@ -199,70 +204,56 @@ const Puskesmas: React.FC = () => {
           </button>
         </div>
         {error && <div className="text-red-500 mb-4">{error}</div>}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 text-left text-gray-600">Nama Puskesmas</th>
-                <th className="px-4 py-2 text-left text-gray-600">Alamat</th>
-                <th className="px-4 py-2 text-left text-gray-600">Email</th>
-                <th className="px-4 py-2 text-left text-gray-600">Action</th>
-                <th className="px-4 py-2 text-left text-gray-600">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {puskesmasData.length > 0 ? (
-                puskesmasData.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-100">
-                    <td className="px-4 py-2">{item.nama_puskesmas}</td>
-                    <td className="px-4 py-2">{item.alamat}</td>
-                    <td className="px-4 py-2">{item.email}</td>
-                    <td className="px-4 py-2">
-                      <button
-                        className="text-purple-500 mr-2"
-                        onClick={() => openEditModal(item)}
-                      >
-                        <BiSolidEdit className="text-lg" />
-                      </button>
-                      <button
-                        className="text-purple-500 mr-2"
-                        onClick={() => openShowModal(item.id)} // Menambahkan action untuk Show
-                      >
-                        <FaRegUser className="text-lg" />
-                      </button>
-                      <button
-                        className="text-red-500"
-                        onClick={() => handleDelete(item.id, item.nama_puskesmas)}
-                      >
-                        <CiTrash className="text-lg" />
-                      </button>
-                    </td>
-                    <td className={`px-4 py-2 ${item.status === "Aktif" ? "text-green-500" : "text-red-500"}`}>
-                      {item.status}
-                    </td>
-                  </tr>
-                ))
-              ) : (
+        {loading ? (
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-300 mb-2"></div>
+            <div className="h-6 bg-gray-300 mb-2"></div>
+            <div className="h-6 bg-gray-300 mb-2"></div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white">
+              <thead>
                 <tr>
-                  <td className="px-4 py-2 text-center" colSpan={5}>
-                    Tidak ada data yang tersedia
-                  </td>
+                  <th className="px-4 py-2 text-left text-gray-600 w-1/4">Nama Puskesmas</th>
+                  <th className="px-4 py-2 text-left text-gray-600 w-1/4">Alamat</th>
+                  <th className="px-4 py-2 text-left text-gray-600 w-1/6">Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {puskesmasData.length > 0 ? (
+                  puskesmasData.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-100">
+                      <td className="px-4 py-2 truncate">{item.nama_puskesmas}</td>
+                      <td className="px-4 py-2 truncate">{item.alamat.split("\n").slice(0, 2).join("\n")}</td>
+                      <td className="px-4 py-2">
+                        <button className="text-purple-500 mr-2" onClick={() => openEditModal(item)}>
+                          <BiSolidEdit className="text-lg" />
+                        </button>
+                        <button className="text-purple-500 mr-2" onClick={() => openShowModal(item.id)}>
+                          <FaRegUser className="text-lg" />
+                        </button>
+                        <button className="text-red-500" onClick={() => handleDelete(item.id, item.nama_puskesmas)}>
+                          <CiTrash className="text-lg" />
+                        </button>
+                      </td>
+                      
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="px-4 py-2 text-center" colSpan={4}>Tidak ada data yang tersedia</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       <AddPuskesmasModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAdd}
-      />
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        puskesmasName={selectedPuskesmasName}
       />
       <EditPuskesmasModal
         isOpen={isEditModalOpen}

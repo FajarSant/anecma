@@ -3,11 +3,17 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
 import { FaRegEdit } from "react-icons/fa";
+import { Toaster, toast } from "sonner";
 
 interface UserData {
   nama_suami?: string;
   no_hp_suami?: string;
   email_suami?: string;
+}
+interface ApiResponse {
+  data: {
+    user: UserData;
+  };
 }
 
 export default function ProfilPage() {
@@ -22,13 +28,15 @@ export default function ProfilPage() {
     async function fetchUserData() {
       if (status === "authenticated" && session?.accessToken) {
         try {
-          const response = await axiosInstance.get("/istri/get-user", {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setUserData(response.data.data);
-          setEditableData(response.data.data);
+          const response = await axiosInstance.get<ApiResponse>(
+            "/istri/get-user",
+            {
+              headers: { Authorization: `Bearer ${session.accessToken}` },
+            }
+          );
+          setUserData(response.data.data.user);
+          setError(null);
         } catch (error) {
-          console.error("Error fetching user data:", error);
           setError("Failed to load user data.");
         }
       } else if (status === "unauthenticated") {
@@ -40,6 +48,10 @@ export default function ProfilPage() {
   }, [session, status]);
 
   const handleEditToggle = () => {
+    if (!isEditing && userData) {
+      // Copy userData to editableData when entering edit mode
+      setEditableData({ ...userData });
+    }
     setIsEditing((prev) => !prev);
   };
 
@@ -54,11 +66,11 @@ export default function ProfilPage() {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           }
         );
-        setUserData(editableData);
+        setUserData(editableData); // Update userData with editableData after saving
         setIsEditing(false);
         setError(null);
+        toast.success("Berhasil Menyimpan.", { duration: 2000 });
       } catch (error) {
-        console.error("Error updating user data:", error);
         setError("Failed to update user data.");
       } finally {
         setSaving(false);
@@ -76,6 +88,7 @@ export default function ProfilPage() {
 
   return (
     <main>
+      <Toaster richColors position="top-center" />
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Halaman Profil</p>
       </div>
@@ -94,11 +107,7 @@ export default function ProfilPage() {
                 id="nama_suami"
                 className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
-                value={
-                  isEditing
-                    ? editableData?.nama_suami || ""
-                    : userData?.nama_suami || ""
-                }
+                value={editableData?.nama_suami || userData?.nama_suami || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
               />
@@ -115,11 +124,7 @@ export default function ProfilPage() {
                 id="no_hp_suami"
                 className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
-                value={
-                  isEditing
-                    ? editableData?.no_hp_suami || ""
-                    : userData?.no_hp_suami || ""
-                }
+                value={editableData?.no_hp_suami || userData?.no_hp_suami || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
               />
@@ -136,11 +141,7 @@ export default function ProfilPage() {
                 id="email_suami"
                 className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
-                value={
-                  isEditing
-                    ? editableData?.email_suami || ""
-                    : userData?.email_suami || ""
-                }
+                value={editableData?.email_suami || userData?.email_suami || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
               />
@@ -158,14 +159,7 @@ export default function ProfilPage() {
                 className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
                 disabled={saving}
               >
-                {saving ? (
-                  <span>Saving...</span>
-                ) : (
-                  <>
-                    <FaRegEdit />
-                    Simpan
-                  </>
-                )}
+                {saving ? <span>Saving...</span> : <><FaRegEdit /> Simpan</>}
               </button>
             ) : (
               <button

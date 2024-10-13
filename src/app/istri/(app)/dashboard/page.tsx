@@ -14,36 +14,38 @@ declare module "next-auth" {
   }
 }
 
-// Define the userData interface
 interface UserData {
   name: string;
+
+}
+
+interface ApiResponse {
+  data: {
+    user: UserData;
+    umur_kehamilan: number;
+  };
 }
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  console.log("session", session);
 
   useEffect(() => {
     async function fetchUserData() {
       if (status === "authenticated" && session?.accessToken) {
         try {
-          const response = await axiosInstance.get("/istri/get-user", {
+          const response = await axiosInstance.get<ApiResponse>("/istri/get-user", {
             headers: { Authorization: `Bearer ${session.accessToken}` },
           });
-          setUserData(response.data.data);
+          setUserData(response.data.data.user);
         } catch (error) {
           console.error("Error fetching user data:", error);
           setError("Failed to load user data.");
-        } finally {
-          setLoading(false);
         }
       } else if (status === "unauthenticated") {
         setError("You need to be logged in.");
-        setLoading(false);
+       
       }
     }
 
@@ -75,13 +77,6 @@ export default function DashboardPage() {
               <FaCircle className="w-1 h-1" />
               <p>HB: 13</p>
             </div>
-            <button
-              type="button"
-              className="text-white bg-blue-light hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              onClick={() => alert("Reminder to drink TTD!")}
-            >
-              Ingatkan Minum TTD
-            </button>
           </div>
           <div>
             <Image
@@ -89,6 +84,7 @@ export default function DashboardPage() {
               alt="Blood Pressure Image"
               width={90}
               height={90}
+              priority
             />
           </div>
         </div>

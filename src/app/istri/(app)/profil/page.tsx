@@ -9,11 +9,21 @@ import { LuUsers } from "react-icons/lu";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
+import { Toaster, toast } from "sonner";
 
 interface UserData {
   name: string;
   usia?: string | null;
   no_hp?: string | null;
+  tempat_tinggal_ktp?: string | null;
+  tempat_tinggal_domisili?: string | null;
+  pendidikan_terakhir?: string | null;
+  pekerjaan?: string | null;
+}
+interface ApiResponse {
+  data: {
+    user: UserData;
+  };
 }
 
 export default function ProfilPage() {
@@ -28,10 +38,13 @@ export default function ProfilPage() {
     async function fetchUserData() {
       if (status === "authenticated" && session?.accessToken) {
         try {
-          const response = await axiosInstance.get("/istri/get-user", {
-            headers: { Authorization: `Bearer ${session.accessToken}` },
-          });
-          setUserData(response.data.data);
+          const response = await axiosInstance.get<ApiResponse>(
+            "/istri/get-user",
+            {
+              headers: { Authorization: `Bearer ${session.accessToken}` },
+            }
+          );
+          setUserData(response.data.data.user);
         } catch (error) {
           console.error("Error fetching user data:", error);
           setError("Failed to load user data.");
@@ -61,7 +74,8 @@ export default function ProfilPage() {
           headers: { Authorization: `Bearer ${session?.accessToken}` },
         }
       );
-      console.log("Data saved successfully:", response.data);
+      toast.success("Berhasil Menyimpan.", { duration: 2000 });
+
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving data:", error);
@@ -71,7 +85,9 @@ export default function ProfilPage() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+  ) => {
     const { id, value } = e.target;
     setUserData((prevData) => ({
       ...prevData,
@@ -84,7 +100,8 @@ export default function ProfilPage() {
   };
 
   return (
-    <main className="flex flex-col min-h-screen">
+    <main className="flex flex-col min-h-screen mb-32">
+      <Toaster richColors position="top-center" />
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Halaman Profil</p>
       </div>
@@ -103,7 +120,7 @@ export default function ProfilPage() {
               onChange={handleChange}
               readOnly={!isEditing}
             />
-           <label
+            <label
               htmlFor="nama"
               className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
@@ -144,6 +161,90 @@ export default function ProfilPage() {
               No HP
             </label>
           </div>
+          <div className="relative my-2.5">
+            <input
+              type="text"
+              id="tempat_tinggal_ktp"
+              value={userData?.tempat_tinggal_ktp ?? ""}
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              placeholder=" "
+              onChange={handleChange}
+              readOnly={!isEditing}
+            />
+            <label
+              htmlFor="tempat_tinggal_ktp"
+              className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+            >
+              Tempat Tinggal KTP
+            </label>
+          </div>
+          <div className="relative my-2.5">
+            <input
+              type="text"
+              id="tempat_tinggal_domisili"
+              value={userData?.tempat_tinggal_domisili ?? ""}
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              placeholder=" "
+              onChange={handleChange}
+              readOnly={!isEditing}
+            />
+            <label
+              htmlFor="tempat_tinggal_domisili"
+              className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+            >
+              Temoat Tinggal Domisili
+            </label>
+          </div>
+          <div className="relative my-2.5">
+            <select
+              id="pendidikan_terakhir"
+              value={userData?.pendidikan_terakhir ?? ""}
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              onChange={handleChange}
+              disabled={!isEditing}
+            >
+              <option value="" disabled>
+                Pilih Pendidikan Terakhir
+              </option>
+              <option value="SMP">SMP</option>
+              <option value="SMA">SMA</option>
+              <option value="S1">S1</option>
+              <option value="S2">S2</option>
+            </select>
+            <label
+              htmlFor="pendidikan_terakhir"
+              className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+            >
+              Pendidikan Terakhir
+            </label>
+          </div>
+          <div className="relative my-2.5">
+            <select
+              id="pekerjaan"
+              value={userData?.pekerjaan ?? ""}
+              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white-background text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              onChange={handleChange}
+              disabled={!isEditing}
+            >
+              <option value="" disabled>
+                Pilih Pekerjaan
+              </option>
+              <option value="Tidak Bekerja">Tidak Bekerja</option>
+              <option value="Karyawan Swasta">Karyawan Swasta</option>
+              <option value="Wirausaha">Wirausaha</option>
+              <option value="PNS">PNS</option>
+              <option value="TNI">TNI</option>
+              <option value="POLRI">POLRI</option>
+              <option value="Buruh">Buruh</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+            <label
+              htmlFor="pekerjaan"
+              className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+            >
+              Pekerjaan
+            </label>
+          </div>
 
           <Link
             href="/istri/profil/data-kehamilan"
@@ -161,31 +262,24 @@ export default function ProfilPage() {
           </Link>
 
           {isEditing ? (
-            <button
-              type="button"
-              onClick={handleSave}
-              className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-              disabled={saving}
-            >
-              {saving ? (
-                <span>Saving...</span>
-              ) : (
-                <>
-                  <FaRegEdit />
-                  Simpan
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleEditToggle}
-              className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
-            >
-              <FaRegEdit />
-              Edit
-            </button>
-          )}
+              <button
+                type="button"
+                onClick={handleSave}
+                className="max-w-fit self-center text-white bg-green-500 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
+                disabled={saving}
+              >
+                {saving ? <span>Saving...</span> : <><FaRegEdit /> Simpan</>}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleEditToggle}
+                className="max-w-fit self-center text-white bg-blue-500 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center gap-2"
+              >
+                <FaRegEdit />
+                Edit
+              </button>
+            )}
         </form>
       </div>
 

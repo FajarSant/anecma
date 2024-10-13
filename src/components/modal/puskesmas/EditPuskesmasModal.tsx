@@ -4,7 +4,6 @@ interface PuskesmasItem {
   id: number;
   nama_puskesmas: string;
   alamat: string;
-  email: string;
   status: string;
 }
 
@@ -20,7 +19,6 @@ const EditPuskesmasModal: React.FC<EditPuskesmasModalProps> = ({ isOpen, onClose
     id: 0,
     nama_puskesmas: '',
     alamat: '',
-    email: '',
     status: ''
   });
 
@@ -78,23 +76,7 @@ const EditPuskesmasModal: React.FC<EditPuskesmasModalProps> = ({ isOpen, onClose
             </label>
           </div>
 
-          <div className="relative z-0 mb-6 w-full group">
-            <input
-              type="email"
-              id="email"
-              value={formData.email}
-              className="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-white text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-            <label
-              htmlFor="email"
-              className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white-background px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
-          >
-              Email
-            </label>
-          </div>
+         
           <div className="flex justify-end">
             <button
               type="button"

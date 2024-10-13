@@ -20,6 +20,7 @@ export default async function LoginPage() {
           alt="Red Blood Cells"
           width="270"
           height="270"
+          priority
         />
       </div>
       <div className="w-full px-10">

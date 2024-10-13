@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { FaHospitalAlt, FaUserMd, FaCog } from 'react-icons/fa';
-import { LuLayoutDashboard } from 'react-icons/lu';
-import Image from 'next/image';
-import axiosInstance from '@/libs/axios';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { FaHospitalAlt, FaUserMd, FaCog, FaBook } from "react-icons/fa";
+import { LuLayoutDashboard } from "react-icons/lu";
+import Image from "next/image";
+import axiosInstance from "@/libs/axios";
 
 interface User {
   name: string;
@@ -14,7 +14,7 @@ interface User {
 }
 
 interface SidebarProps {
-  currentPath: string; // Add currentPath prop to Sidebar
+  currentPath: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
@@ -24,16 +24,16 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const authToken = localStorage.getItem('authToken');
+        const authToken = localStorage.getItem("authToken");
 
         if (!authToken) {
-          setError('No token found');
+          setError("No token found");
           return;
         }
 
-        const response = await axiosInstance.get<User>('/user', {
+        const response = await axiosInstance.get<User>("/user", {
           headers: {
-            'Authorization': `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
           },
         });
 
@@ -42,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
         if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError('Error fetching user data');
+          setError("Error fetching user data");
         }
       }
     };
@@ -51,11 +51,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
   }, []);
 
   const isActive = (path: string) => {
-    return currentPath === path ? 'bg-indigo-400 text-white' : 'hover:bg-indigo-300';
+    return currentPath === path
+      ? "bg-indigo-400 text-white"
+      : "hover:bg-indigo-300";
   };
 
   return (
-    <div className="fixed top-0 left-0 bg-white  w-64 h-screen flex flex-col shadow-lg border-r">
+    <div className="fixed top-0 left-0 bg-white w-64 h-screen flex flex-col shadow-lg border-r">
       <div className="p-4 flex items-center border-b">
         {error ? (
           <p className="text-red-500">{error}</p>
@@ -69,8 +71,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
               className="rounded-full border border-gray-300 mr-4"
             />
             <div>
-              <h2 className="text-lg font-semibold">{user?.name || "Default User"}</h2>
-              <h2 className="text-lg font-semibold">{user?.role || "Default Role"}</h2>
+              <h2 className="text-lg font-semibold">
+                {user?.name || "Default User"}
+              </h2>
+              <h2 className="text-lg font-semibold">
+                {user?.role || "Default Role"}
+              </h2>
             </div>
           </>
         )}
@@ -80,7 +86,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
         <ul>
           <li className="mb-6">
             <Link href="/admin/dashboard">
-              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/dashboard')}`}>
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/dashboard"
+                )}`}
+              >
                 <LuLayoutDashboard className="text-xl mr-3" />
                 <span className="text-lg">Dashboard</span>
               </span>
@@ -88,7 +98,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
           </li>
           <li className="mb-6">
             <Link href="/admin/puskesmas">
-              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/puskesmas')}`}>
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/puskesmas"
+                )}`}
+              >
                 <FaHospitalAlt className="text-xl mr-3" />
                 <span className="text-lg">Data Puskesmas</span>
               </span>
@@ -96,15 +110,35 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath }) => {
           </li>
           <li className="mb-6">
             <Link href="/admin/petugas">
-              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/petugas')}`}>
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/petugas"
+                )}`}
+              >
                 <FaUserMd className="text-xl mr-3" />
                 <span className="text-lg">Data Petugas</span>
               </span>
             </Link>
           </li>
+          <li className="mb-6">
+            <Link href="/admin/edukasi">
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/edukasi"
+                )}`}
+              >
+                <FaBook className="text-xl mr-3" /> {/* Updated icon */}
+                <span className="text-lg">Data Edukasi</span>
+              </span>
+            </Link>
+          </li>
           <li>
             <Link href="/admin/settings">
-              <span className={`flex items-center p-2 rounded-xl w-full text-left ${isActive('/admin/settings')}`}>
+              <span
+                className={`flex items-center p-2 rounded-xl w-full text-left ${isActive(
+                  "/admin/settings"
+                )}`}
+              >
                 <FaCog className="text-xl mr-3" />
                 <span className="text-lg">Settings</span>
               </span>

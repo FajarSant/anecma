@@ -8,7 +8,6 @@ interface ShowPuskesmasModalProps {
     id: number;
     nama_puskesmas: string;
     alamat: string;
-    email: string;
     status: string;
   } | null;
 }
@@ -38,12 +37,7 @@ const ShowPuskesmasModal: React.FC<ShowPuskesmasModalProps> = ({ isOpen, onClose
               <strong>Alamat:</strong> {puskesmasData.alamat}
             </span>
           </div>
-          <div className="flex items-center">
-            <FaEnvelope className="mr-3 text-purple-500" />
-            <span>
-              <strong>Email:</strong> {puskesmasData.email}
-            </span>
-          </div>
+          
           <div className="flex items-center">
             {puskesmasData.status === "Aktif" ? (
               <FaCheckCircle className="mr-3 text-green-500" />

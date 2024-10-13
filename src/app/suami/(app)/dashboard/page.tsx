@@ -29,7 +29,7 @@ const DashboardSuami = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
+console.log(session)
   useEffect(() => {
     async function fetchUserData() {
       if (status === "authenticated" && session?.accessToken) {

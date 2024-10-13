@@ -6,7 +6,7 @@ import { IoChatbubblesOutline } from "react-icons/io5";
 import { LuUsers, LuAlarmCheck } from "react-icons/lu";
 import { useSession } from "next-auth/react";
 import axiosInstance from "@/libs/axios";
-import { toast, Toaster } from "react-hot-toast"; // Importing Toaster and toast
+import { toast, Toaster } from "sonner"
 
 export default function ReminderTtdPage() {
   const { data: session, status } = useSession();
@@ -53,7 +53,6 @@ export default function ReminderTtdPage() {
           waktu_reminder_2: formatTime(eveningReminderTime), // Ensures HH:mm format
           is_active_reminder_2: eveningReminderActive,
         };
-        console.log("Sending data:", dataToSend); // Console log the data
 
         const response = await axiosInstance.post(
           "/istri/dashboard/reminder-ttd",
@@ -65,7 +64,6 @@ export default function ReminderTtdPage() {
 
         setSuccess("Data berhasil disimpan!");
         setError(null);
-        console.log("Response:", response.data);
 
         // Show success toast notification
         toast.success("Reminder TTD berhasil di tambahkan!", {
@@ -100,7 +98,7 @@ export default function ReminderTtdPage() {
 
   return (
     <main>
-      <Toaster /> {/* Toast component for notifications */}
+      <Toaster richColors position="top-center" />
       {/* Header */}
       <div className="m-5 flex flex-row">
         <p className="text-2xl font-bold">Reminder TTD</p>
