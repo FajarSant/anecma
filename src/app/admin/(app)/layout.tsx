@@ -1,17 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/sidebar'; // Adjust the import path as needed
-import TopBar from '../components/topbar'; // Adjust the import path as needed
-import { usePathname } from 'next/navigation'; // For App Router
+import Sidebar from '../components/sidebar'; 
+import TopBar from '../components/topbar';
+import { usePathname } from 'next/navigation'; 
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const pathname = usePathname(); // Get the current path
+  const pathname = usePathname(); 
 
-  // Extract user information if needed (mocked here for demonstration)
-  const userName = "User Name"; // Replace with dynamic user data if available
-  const userImage = "/images/bidan.png"; // Replace with dynamic user image if available
-
+  const userName = "User Name"; 
+  const userImage = "/images/bidan.png"; 
   return (
     <div className="flex h-screen flex-col">
       {/* Sidebar with current path */}
